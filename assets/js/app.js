@@ -457,7 +457,7 @@
       uGridA: { value: new THREE.Color('#ffb7d2') },
       uGridB: { value: new THREE.Color('#ffffff') },
       uRim: { value: new THREE.Color('#ff5fa8') },
-      uCoverBoost: { value: 1.45 }
+      uCoverBoost: { value: 0.72 }
     };
 
     var mat = new THREE.ShaderMaterial({
@@ -500,13 +500,15 @@
         '  vec2 atlasUv = vec2((tile + localU) / uCount, localV);',
         '  vec4 cover = texture2D(uAtlas, atlasUv);',
         '  float isActive = step(abs(tile - uActive), 0.5);',
-        '  vec3 panel = cover.rgb * (0.9 + led * 0.5);',
-        '  panel = mix(panel, panel + vec3(0.25, 0.08, 0.22), isActive * 0.75);',
-        '  panel += isActive * vec3(0.22, 0.05, 0.18) * (0.5 + 0.5 * sin(uTime * 4.0));',
-        '  vec3 col = base * (0.13 + led * 1.05) + ledCol * (0.1 + led * 0.5);',
+        '  vec3 panel = cover.rgb * (0.78 + led * 0.22);',
+        '  panel = mix(panel, panel + vec3(0.10, 0.03, 0.08), isActive * 0.75);',
+        '  panel += isActive * vec3(0.10, 0.02, 0.08) * (0.5 + 0.5 * sin(uTime * 4.0));',
+        '  vec3 col = base * (0.18 + led * 0.52) + ledCol * (0.06 + led * 0.22);',
         '  col += panel * band * uCoverBoost;',
-        '  col += uRim * fres * (0.55 + led * 0.65);',
-        '  col += uGridB * pow(max(led, 0.0), 4.0) * 0.16;',
+        '  col += uRim * fres * (0.18 + led * 0.28);',
+        '  col += uGridB * pow(max(led, 0.0), 4.0) * 0.06;',
+        '  col = clamp(col, 0.0, 1.0);',
+        '  col = pow(col, vec3(0.4545));',
         '  gl_FragColor = vec4(col, 1.0);',
         '}'
       ].join('\n')
@@ -1368,7 +1370,7 @@
     dir: 0xffffff, dirIntensity: 1.0,
     point: 0xff8fbc, pointIntensity: 1.5,
     starOpacity: 0.35, particleColor: '#ffc5dd', particleOpacity: 0.6,
-    nebulaOpacity: 0.25, bloomStrength: 0.55
+    nebulaOpacity: 0.25, bloomStrength: 0.16, bloomThreshold: 0.88
   };
   var NIGHT_PALETTE = {
     skyTop: '#1b0a16', skyMid: '#5d1736', skyBottom: '#2a0d25', skyHorizon: '#ff8fbc',
@@ -1378,7 +1380,7 @@
     dir: 0xffc4da, dirIntensity: 0.75,
     point: 0xff5fa8, pointIntensity: 2.0,
     starOpacity: 1.0, particleColor: '#ffb3d1', particleOpacity: 0.85,
-    nebulaOpacity: 0.42, bloomStrength: 0.8
+    nebulaOpacity: 0.42, bloomStrength: 0.45, bloomThreshold: 0.72
   };
 
   function applyPalette(p) {
@@ -1416,7 +1418,10 @@
       }
       if (m.uniforms && m.uniforms.uRim) m.uniforms.uRim.value.set(p.rim);
     });
-    if (bloomPass) bloomPass.strength = p.bloomStrength;
+    if (bloomPass) {
+      bloomPass.strength = p.bloomStrength;
+      if (p.bloomThreshold != null) bloomPass.threshold = p.bloomThreshold;
+    }
   }
 
   function toggleTheme() {
@@ -1887,6 +1892,17 @@
     }
 
     window.addEventListener('resize', onResize);
+    // 轻量诊断钩子（不参与 UI，便于自动化验收与排障）
+    window.__XBW_DEBUG = {
+      renderer: renderer,
+      scene: scene,
+      camera: camera,
+      controls: controls,
+      sphereMesh: sphereMesh,
+      sphereUniforms: sphereUniforms,
+      frameMeshes: frameMeshes,
+      flyTo: flyTo
+    };
     document.addEventListener('visibilitychange', function () {
       if (document.hidden && MusicBox.playing) {
         MusicBox.stop();
