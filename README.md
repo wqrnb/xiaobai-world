@@ -6,10 +6,8 @@
 
 ## 线上访问
 
-部署后地址：
-
 ```text
-https://<你的GitHub用户名>.github.io/xiaobai-world/
+https://wqrnb.github.io/xiaobai-world/
 ```
 
 ## 本地运行
