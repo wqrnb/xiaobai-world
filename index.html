@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#ff7bac">
+  <meta name="description" content="小白大世界 — 小白超白的的个人作品集 3D 大世界：娃娃开箱、好物测评、GBC、chiikawa。">
+  <title>小白大世界 · Xiaobai's World</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <div id="app" class="app">
+    <div id="stage" aria-label="3D 大世界舞台"></div>
+
+    <!-- 顶部导航 -->
+    <header class="topbar" id="topbar">
+      <a class="brand" href="#" data-slot="home" aria-label="回到首页">
+        <span class="brand-badge">💗</span>
+        <span class="brand-text">
+          <b>小白大世界</b>
+          <i>XIAOBAI'S WORLD</i>
+        </span>
+      </a>
+
+      <nav class="nav-pills" aria-label="世界传送门">
+        <button class="pill active" data-slot="home">首页</button>
+        <button class="pill" data-slot="works">作品</button>
+        <button class="pill" data-slot="videos">视频墙</button>
+        <button class="pill" data-slot="about">关于小白</button>
+        <button class="pill" data-slot="follow">关注</button>
+      </nav>
+
+      <div class="top-actions">
+        <button class="icon-btn" id="search-btn" title="搜索作品" aria-label="搜索作品">🔍</button>
+        <button class="icon-btn" id="theme-btn" title="切换日夜氛围" aria-label="切换日夜氛围">🌙</button>
+        <button class="icon-btn" id="music-btn" title="播放背景音乐（默认关闭）" aria-label="播放背景音乐">🎵</button>
+      </div>
+    </header>
+
+    <!-- 世界状态信息 -->
+    <div class="world-chip" id="world-chip">
+      <span id="world-chip-emoji">☀️</span>
+      <span id="world-chip-text">粉色日间泡泡园</span>
+    </div>
+
+    <div class="stats-strip" id="stats-strip" aria-label="账号数据">
+      <div class="stat-mini"><b id="stat-bili-fans">2,518</b><span>B站粉丝</span></div>
+      <div class="stat-mini"><b id="stat-bili-play">163.9万</b><span>B站播放</span></div>
+      <div class="stat-mini"><b id="stat-xhs-fans">1千+</b><span>小红书粉丝</span></div>
+      <div class="stat-mini"><b id="stat-xhs-like">1万+</b><span>获赞与收藏</span></div>
+    </div>
+
+    <!-- 预设视角 -->
+    <div class="camera-dock" id="camera-dock" aria-label="预设视角">
+      <button class="cam-btn" data-slot="home">🌐<span>球体正面</span></button>
+      <button class="cam-btn" data-slot="works">🏝️<span>小红书岛</span></button>
+      <button class="cam-btn" data-slot="videos">📺<span>B站视频墙</span></button>
+      <button class="cam-btn" data-slot="images">🎀<span>图文展厅</span></button>
+      <button class="cam-btn" data-slot="about">🐰<span>关于小白</span></button>
+      <button class="cam-btn" data-slot="follow">💌<span>关注</span></button>
+    </div>
+
+    <!-- 搜索面板 -->
+    <section class="search-panel" id="search-panel" aria-hidden="true">
+      <div class="search-card">
+        <div class="search-head">
+          <div class="search-input-wrap">
+            <span>🔍</span>
+            <input id="search-input" type="search" placeholder="搜「开箱 / GBC / chiikawa / 测评」" autocomplete="off">
+          </div>
+          <button class="icon-btn ghost" id="search-close" aria-label="关闭搜索">✕</button>
+        </div>
+        <div class="search-hints" id="search-hints">
+          <button data-q="开箱">🧸 开箱</button>
+          <button data-q="GBC">🎸 GBC</button>
+          <button data-q="chiikawa">🐰 chiikawa</button>
+          <button data-q="测评">🛍️ 测评</button>
+          <button data-q="收纳">🗂️ 收纳</button>
+        </div>
+        <ul class="search-results" id="search-results"></ul>
+      </div>
+    </section>
+
+    <!-- 详情弹层 -->
+    <div class="modal" id="detail-modal" aria-hidden="true">
+      <div class="modal-backdrop" data-close-detail></div>
+      <article class="detail-card" role="dialog" aria-modal="true" aria-labelledby="detail-title">
+        <button class="detail-close icon-btn" data-close-detail aria-label="关闭详情">✕</button>
+        <div class="detail-cover-wrap">
+          <img id="detail-cover" alt="">
+          <span class="detail-type" id="detail-type"></span>
+          <span class="detail-cat" id="detail-cat"></span>
+        </div>
+        <div class="detail-body">
+          <h2 id="detail-title"></h2>
+          <div class="detail-stats" id="detail-stats"></div>
+          <p class="detail-note" id="detail-note"></p>
+          <a class="primary-link" id="detail-link" href="#" target="_blank" rel="noopener noreferrer">打开原作品 ↗</a>
+        </div>
+      </article>
+    </div>
+
+    <!-- 提示 -->
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <!-- 加载页 -->
+    <div class="loading" id="loading">
+      <div class="loading-orb">
+        <span>💗</span>
+      </div>
+      <h1>小白大世界</h1>
+      <p>正在点亮 LED 大球、唤醒漂浮岛…</p>
+      <div class="loading-dots"><i></i><i></i><i></i></div>
+    </div>
+
+    <!-- 2D 静态降级页 -->
+    <div class="fallback" id="fallback" hidden>
+      <div class="fallback-inner">
+        <div class="fallback-hero">
+          <img id="fallback-avatar" alt="小白超白的头像">
+          <h1>小白大世界</h1>
+          <p class="fallback-sub">XIAOBAI'S WORLD · 3D 未启用时的静态版</p>
+          <p class="fallback-bio" id="fallback-bio"></p>
+          <div class="fallback-links">
+            <a id="fallback-bili" href="#" target="_blank" rel="noopener noreferrer">📺 去B站看小白</a>
+            <a id="fallback-xhs" href="#" target="_blank" rel="noopener noreferrer">📕 去小红书看小白</a>
+          </div>
+        </div>
+        <div class="fallback-stats" id="fallback-stats"></div>
+        <section class="fallback-section">
+          <h2>📕 小红书作品 <span id="fallback-xhs-count"></span></h2>
+          <div class="fallback-grid" id="fallback-xhs-grid"></div>
+        </section>
+        <section class="fallback-section">
+          <h2>📺 B站视频 <span id="fallback-bili-count"></span></h2>
+          <div class="fallback-grid" id="fallback-bili-grid"></div>
+        </section>
+        <footer class="fallback-footer">💗 加油加油～</footer>
+      </div>
+    </div>
+  </div>
+
+  <!-- 数据内嵌：保证 file:// 双击可用 -->
+  <script src="assets/js/data.js"></script>
+  <!-- 图片以 data URI 内嵌（WebGL 在 file:// 下不能直接采样本地图片文件） -->
+  <script src="assets/js/images.js"></script>
+  <!-- Three.js r128 与后处理全部本地打包 -->
+  <script src="assets/lib/three.min.js"></script>
+  <script src="assets/lib/OrbitControls.js"></script>
+  <script src="assets/lib/postprocessing/CopyShader.js"></script>
+  <script src="assets/lib/postprocessing/EffectComposer.js"></script>
+  <script src="assets/lib/postprocessing/ShaderPass.js"></script>
+  <script src="assets/lib/postprocessing/LuminosityHighPassShader.js"></script>
+  <script src="assets/lib/postprocessing/UnrealBloomPass.js"></script>
+  <script src="assets/lib/postprocessing/RenderPass.js"></script>
+  <script src="assets/lib/postprocessing/MaskPass.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
