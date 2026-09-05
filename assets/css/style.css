@@ -63,7 +63,6 @@ img { display: block; }
 .filter-chip .icon, .search-result-main .icon { width: 13px; height: 13px; vertical-align: -2px; }
 .sector-tag .icon, .foot-chip .icon, .strip-chip .icon { width: 12px; height: 12px; vertical-align: -1px; }
 .eyebrow .icon { width: 14px; height: 14px; }
-.hint-bar .icon { width: 14px; height: 14px; }
 
 /* ============ 3D 背景 ============ */
 .bg-scene { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
@@ -298,8 +297,6 @@ html[data-theme="dark"] .search-input-wrap { background: rgba(255, 255, 255, .08
 
 /* ============ 全局装饰 ============ */
 .fx-canvas { position: fixed; inset: 0; z-index: 48; pointer-events: none; }
-.hint-bar { position: fixed; left: 16px; bottom: 14px; z-index: 45; display: flex; align-items: center; gap: 8px; padding: 9px 14px; border-radius: 999px; background: var(--glass); border: 1px solid var(--glass-border); box-shadow: var(--shadow-sm); backdrop-filter: blur(12px) saturate(1.2); -webkit-backdrop-filter: blur(12px) saturate(1.2); font-size: 12px; font-weight: 800; color: var(--muted); pointer-events: none; }
-body.xwb-no3d .hint-bar { display: none; }
 
 /* ============ 响应式 ============ */
 /* 平板/手机：面板变为底部展开的全息面板，星球让出上方空间 */
@@ -324,7 +321,6 @@ body.xwb-no3d .hint-bar { display: none; }
   .nav-links a { padding: 8px 10px; font-size: 12px; }
   .top-actions { gap: 4px; }
   .icon-btn { width: 34px; height: 34px; }
-  .hint-bar { display: none; }
   .hero-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .detail-card { grid-template-columns: 1fr; max-height: 88vh; }
   .detail-cover-wrap { min-height: 210px; }
