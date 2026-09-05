@@ -567,29 +567,31 @@
   /* 五个分区：发光节点 + 光晕 + 表面定位环 + 文字标识 */
   function makeLabelTexture(title, sub) {
     var c = document.createElement('canvas');
-    c.width = 512; c.height = 128;
+    c.width = 1024; c.height = 256;
     var ctx = c.getContext('2d');
     ctx.shadowColor = 'rgba(255,60,150,0.75)';
-    ctx.shadowBlur = 18;
-    ctx.fillStyle = 'rgba(255,242,248,0.9)';
-    roundRect(ctx, 20, 14, 472, 100, 50);
+    ctx.shadowBlur = 36;
+    ctx.fillStyle = 'rgba(255,242,248,0.92)';
+    roundRect(ctx, 40, 28, 944, 200, 100);
     ctx.fill();
     ctx.shadowBlur = 0;
     ctx.strokeStyle = '#ff5c9b';
-    ctx.lineWidth = 4;
-    roundRect(ctx, 20, 14, 472, 100, 50);
+    ctx.lineWidth = 8;
+    roundRect(ctx, 40, 28, 944, 200, 100);
     ctx.stroke();
     ctx.fillStyle = '#c22f70';
-    ctx.font = '700 44px "Microsoft YaHei UI", "PingFang SC", sans-serif';
+    ctx.font = '700 88px "Microsoft YaHei UI", "PingFang SC", sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(title, 256, 58);
+    ctx.fillText(title, 512, 116);
     ctx.fillStyle = 'rgba(180,60,120,0.85)';
-    ctx.font = '700 21px "Microsoft YaHei UI", sans-serif';
-    ctx.fillText(sub, 256, 96);
+    ctx.font = '700 42px "Microsoft YaHei UI", sans-serif';
+    ctx.fillText(sub, 512, 192);
     var tex = new THREE.CanvasTexture(c);
     tex.encoding = THREE.sRGBEncoding;
-    tex.minFilter = THREE.LinearFilter;
+    tex.minFilter = THREE.LinearMipmapLinearFilter;
+    tex.magFilter = THREE.LinearFilter;
+    tex.generateMipmaps = true;
     return tex;
   }
 
