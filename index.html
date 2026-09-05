@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
+    <script src="assets/js/icons.js"></script>
   <!-- 背景氛围：3D 大爆炸星云画布 + CSS 兜底氛围 -->
   <div class="bg-scene" aria-hidden="true">
     <div class="webgl-stage" id="webgl-stage-wrap">
@@ -27,7 +28,7 @@
   <!-- 顶部导航 -->
   <header class="topbar" id="topbar">
     <a class="brand" href="#about">
-      <span class="brand-badge">💗</span>
+      <span class="brand-badge"><svg class="icon" aria-hidden="true"><use href="#i-heart"></use></svg></span>
       <span class="brand-text">
         <b>小白大世界</b>
         <i>XIAOBAI'S WORLD</i>
@@ -43,9 +44,9 @@
     </nav>
 
     <div class="top-actions">
-      <button class="icon-btn" id="search-btn" title="搜索作品" aria-label="搜索作品">🔍</button>
-      <button class="icon-btn" id="theme-btn" title="切换日夜氛围" aria-label="切换日夜氛围">🌙</button>
-      <button class="icon-btn" id="music-btn" title="播放背景音乐（默认关闭）" aria-label="播放背景音乐">🎵</button>
+      <button class="icon-btn" id="search-btn" title="搜索作品" aria-label="搜索作品"><svg class="icon" aria-hidden="true"><use href="#i-search"></use></svg></button>
+      <button class="icon-btn" id="theme-btn" title="切换日夜氛围" aria-label="切换日夜氛围"><svg class="icon" aria-hidden="true"><use href="#i-moon"></use></svg></button>
+      <button class="icon-btn" id="music-btn" title="播放背景音乐（默认关闭）" aria-label="播放背景音乐"><svg class="icon" aria-hidden="true"><use href="#i-music"></use></svg></button>
     </div>
   </header>
 
@@ -54,18 +55,18 @@
     <section class="hero section" id="about">
       <div class="hero-shell">
         <div class="hero-copy">
-          <p class="eyebrow reveal">🐰 你好呀，这里是</p>
+          <p class="eyebrow reveal"><svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg> 你好呀，这里是</p>
           <h1 class="hero-name reveal" style="--d:.06s">小白超白的</h1>
           <p class="hero-sub reveal" style="--d:.12s">XIAOBAI'S WORLD · 小白大世界</p>
           <p class="hero-bio reveal" style="--d:.18s">
-            小白的二次元日常～ 喜欢粉色的小可爱们！！！ 嘿嘿💗💗💗
+            小白的二次元日常～ 喜欢粉色的小可爱们！！！
           </p>
 
           <div class="hero-stats reveal" style="--d:.24s" id="hero-stats"></div>
 
           <div class="hero-actions reveal" style="--d:.3s">
-            <a class="btn btn-primary" id="hero-bili" href="#" target="_blank" rel="noopener noreferrer">📺 去B站看小白</a>
-            <a class="btn btn-ghost" id="hero-xhs" href="#" target="_blank" rel="noopener noreferrer">📕 小红书主页</a>
+            <a class="btn btn-primary" id="hero-bili" href="#" target="_blank" rel="noopener noreferrer"><svg class="icon" aria-hidden="true"><use href="#i-tv"></use></svg> 去B站看小白</a>
+            <a class="btn btn-ghost" id="hero-xhs" href="#" target="_blank" rel="noopener noreferrer"><svg class="icon" aria-hidden="true"><use href="#i-book-heart"></use></svg> 小红书主页</a>
           </div>
           <p class="hero-sign reveal" style="--d:.36s" id="hero-sign">加油加油～</p>
         </div>
@@ -74,16 +75,16 @@
           <div class="orbit orbit-a"></div>
           <div class="orbit orbit-b"></div>
           <div class="orbit orbit-c"></div>
-          <span class="orbit-emoji oe-1">🧸</span>
-          <span class="orbit-emoji oe-2">🎀</span>
-          <span class="orbit-emoji oe-3">💗</span>
-          <span class="orbit-emoji oe-4">🐰</span>
+          <span class="orbit-emoji oe-1"><svg class="icon" aria-hidden="true"><use href="#i-package"></use></svg></span>
+          <span class="orbit-emoji oe-2"><svg class="icon" aria-hidden="true"><use href="#i-heart"></use></svg></span>
+          <span class="orbit-emoji oe-3"><svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg></span>
+          <span class="orbit-emoji oe-4"><svg class="icon" aria-hidden="true"><use href="#i-rabbit"></use></svg></span>
           <div class="avatar-medallion">
             <img id="hero-avatar" alt="小白超白的头像">
           </div>
-          <span class="hero-sticker s1">✨</span>
-          <span class="hero-sticker s2">🍓</span>
-          <span class="hero-sticker s3">🫧</span>
+          <span class="hero-sticker s1"><svg class="icon" aria-hidden="true"><use href="#i-star"></use></svg></span>
+          <span class="hero-sticker s2"><svg class="icon" aria-hidden="true"><use href="#i-heart"></use></svg></span>
+          <span class="hero-sticker s3"><svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg></span>
         </div>
       </div>
 
@@ -97,8 +98,8 @@
     <section class="section showcase" id="featured">
       <div class="section-head reveal">
         <span class="section-kicker">FEATURED</span>
-        <h2>✨ 精选焦点</h2>
-        <p>先看几件小白最受欢迎的小作品 💗</p>
+        <h2><svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg> 精选焦点</h2>
+        <p>先看几件小白最受欢迎的小作品</p>
       </div>
       <div class="featured-scroller" id="featured-scroller"></div>
     </section>
@@ -107,7 +108,7 @@
     <section class="section island xhs-section" id="xhs">
       <div class="section-head reveal">
         <span class="section-kicker">XIAOHONGSHU ISLAND</span>
-        <h2>📕 小红书岛</h2>
+        <h2><svg class="icon" aria-hidden="true"><use href="#i-book-heart"></use></svg> 小红书岛</h2>
         <p>32 件真实作品 · 开箱 / 测评 / GBC / chiikawa</p>
       </div>
       <div class="filters reveal" id="xhs-filters"></div>
@@ -118,7 +119,7 @@
     <section class="section island bili-section" id="bili">
       <div class="section-head reveal">
         <span class="section-kicker">BILIBILI VIDEO WALL</span>
-        <h2>📺 B站视频墙</h2>
+        <h2><svg class="icon" aria-hidden="true"><use href="#i-clapperboard"></use></svg> B站视频墙</h2>
         <p>42 支视频 · 播放 / 弹幕 / 日期全部真实</p>
       </div>
       <div class="filters reveal" id="bili-filters"></div>
@@ -129,12 +130,12 @@
     <section class="section follow-section" id="follow">
       <div class="section-head reveal">
         <span class="section-kicker">FOLLOW XIAOBAI</span>
-        <h2>💌 关注小白</h2>
+        <h2><svg class="icon" aria-hidden="true"><use href="#i-heart"></use></svg> 关注小白</h2>
         <p>日常、开箱、GBC、chiikawa…都在这里更新</p>
       </div>
       <div class="follow-cards" id="follow-cards"></div>
       <footer class="footer">
-        <p>💗 小白大世界 · 加油加油～</p>
+        <p><svg class="icon" aria-hidden="true"><use href="#i-heart"></use></svg> 小白大世界 · 加油加油～</p>
         <p>所有作品数据与封面来自小白超白的公开主页，仅作个人作品集展示。</p>
       </footer>
     </section>
@@ -145,17 +146,17 @@
     <div class="search-card">
       <div class="search-head">
         <div class="search-input-wrap">
-          <span>🔍</span>
+          <span><svg class="icon" aria-hidden="true"><use href="#i-search"></use></svg></span>
           <input id="search-input" type="search" placeholder="搜「开箱 / GBC / chiikawa / 测评」" autocomplete="off">
         </div>
-        <button class="icon-btn ghost" id="search-close" aria-label="关闭搜索">✕</button>
+        <button class="icon-btn ghost" id="search-close" aria-label="关闭搜索"><svg class="icon" aria-hidden="true"><use href="#i-x"></use></svg></button>
       </div>
       <div class="search-hints" id="search-hints">
-        <button data-q="开箱">🧸 开箱</button>
-        <button data-q="GBC">🎸 GBC</button>
-        <button data-q="chiikawa">🐰 chiikawa</button>
-        <button data-q="测评">🛍️ 测评</button>
-        <button data-q="收纳">🗂️ 收纳</button>
+        <button data-q="开箱"><svg class="icon" aria-hidden="true"><use href="#i-package"></use></svg> 开箱</button>
+        <button data-q="GBC"><svg class="icon" aria-hidden="true"><use href="#i-guitar"></use></svg> GBC</button>
+        <button data-q="chiikawa"><svg class="icon" aria-hidden="true"><use href="#i-rabbit"></use></svg> chiikawa</button>
+        <button data-q="测评"><svg class="icon" aria-hidden="true"><use href="#i-shopping-bag"></use></svg> 测评</button>
+        <button data-q="收纳"><svg class="icon" aria-hidden="true"><use href="#i-package"></use></svg> 收纳</button>
       </div>
       <ul class="search-results" id="search-results"></ul>
     </div>
@@ -165,7 +166,7 @@
   <div class="modal" id="detail-modal" aria-hidden="true">
     <div class="modal-backdrop" data-close-detail></div>
     <article class="detail-card" role="dialog" aria-modal="true" aria-labelledby="detail-title">
-      <button class="detail-close icon-btn" data-close-detail aria-label="关闭详情">✕</button>
+      <button class="detail-close icon-btn" data-close-detail aria-label="关闭详情"><svg class="icon" aria-hidden="true"><use href="#i-x"></use></svg></button>
       <div class="detail-cover-wrap">
         <img id="detail-cover" alt="">
         <span class="detail-cat" id="detail-cat"></span>
@@ -175,12 +176,12 @@
         <h2 id="detail-title"></h2>
         <div class="detail-stats" id="detail-stats"></div>
         <p class="detail-note">数据来自小白超白的真实公开主页。</p>
-        <a class="primary-link" id="detail-link" href="#" target="_blank" rel="noopener noreferrer">打开原作品 ↗</a>
+        <a class="primary-link" id="detail-link" href="#" target="_blank" rel="noopener noreferrer"><svg class="icon" aria-hidden="true"><use href="#i-external-link"></use></svg> 打开原作品</a>
       </div>
     </article>
   </div>
 
-  <button class="back-top" id="back-top" aria-label="回到顶部">↑</button>
+  <button class="back-top" id="back-top" aria-label="回到顶部"><svg class="icon" aria-hidden="true"><use href="#i-arrow-up"></use></svg></button>
 
   <script src="assets/js/data.js"></script>
   <!-- 3D 大爆炸背景：Three.js + 后处理全部本地打包 -->

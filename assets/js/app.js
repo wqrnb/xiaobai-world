@@ -35,6 +35,23 @@
   var CATEGORY_META = {};
   DATA.categories.forEach(function (c) { CATEGORY_META[c.key] = c; });
 
+  function icon(name, cls) {
+    if (window.xbIcon) return window.xbIcon(name, cls);
+    return '';
+  }
+
+  var CATEGORY_ICONS = {
+    '娃娃开箱': 'package',
+    '测评分享': 'shopping-bag',
+    'GBC': 'guitar',
+    'chiikawa': 'rabbit',
+    '日常': 'heart'
+  };
+
+  function categoryIcon(key) {
+    return CATEGORY_ICONS[key] || 'sparkles';
+  }
+
   function categoryOf(item) {
     return CATEGORY_META[item.category] || CATEGORY_META['日常'];
   }
@@ -52,16 +69,16 @@
     $('#hero-avatar').alt = meta.name;
     $('#hero-bili').href = meta.biliUrl;
     $('#hero-xhs').href = meta.xhsUrl;
-    $('#hero-sign').textContent = meta.sign + ' · 📍' + meta.ip;
+    $('#hero-sign').innerHTML = escapeHtml(meta.sign) + ' · ' + icon('map-pin') + escapeHtml(meta.ip);
 
     var stats = [
-      ['B站粉丝', DATA.stats.bili.fans],
-      ['B站播放', DATA.stats.bili.plays],
-      ['B站获赞', DATA.stats.bili.likes],
-      ['小红书粉丝', DATA.stats.xhs.followers]
+      ['B站粉丝', DATA.stats.bili.fans, 'users'],
+      ['B站播放', DATA.stats.bili.plays, 'play'],
+      ['B站获赞', DATA.stats.bili.likes, 'thumbs-up'],
+      ['小红书粉丝', DATA.stats.xhs.followers, 'heart']
     ];
     $('#hero-stats').innerHTML = stats.map(function (s) {
-      return '<div class="stat-chip"><b>' + escapeHtml(s[1]) + '</b><span>' + escapeHtml(s[0]) + '</span></div>';
+      return '<div class="stat-chip">' + icon(s[2]) + '<b>' + escapeHtml(s[1]) + '</b><span>' + escapeHtml(s[0]) + '</span></div>';
     }).join('');
   }
 
@@ -69,14 +86,14 @@
    * 2. 背景氛围
    * ============================================================ */
   function buildBackground() {
-    var emojis = ['💗', '🎀', '🧸', '🐰', '🍓', '🫧', '✨', '🍰', '🦀', '👗'];
+    var iconNames = ['heart', 'sparkles', 'star', 'rabbit', 'guitar', 'shopping-bag', 'package', 'camera'];
     var floatHtml = '';
     for (var i = 0; i < 18; i++) {
       var left = Math.round((i * 53) % 100);
       var top = Math.round((i * 37 + 11) % 100);
       var delay = -(i % 9) * 1.7;
       floatHtml += '<span class="floaty" style="left:' + left + '%;top:' + top + '%;animation-delay:' + delay + 's">' +
-        emojis[i % emojis.length] + '</span>';
+        icon(iconNames[i % iconNames.length]) + '</span>';
     }
     $('#floaties').innerHTML = floatHtml;
 
@@ -97,20 +114,20 @@
     var cat = categoryOf(item);
     var isBili = kind === 'bili';
     var meta = isBili
-      ? '▶ ' + numberLabel(item.play) + ' · 💬 ' + numberLabel(item.danmu)
-      : '👍 ' + numberLabel(item.likes);
-    var overlay = isBili ? '<div class="play-overlay"><i>▶</i></div>' : '';
+      ? icon('play') + numberLabel(item.play) + ' · ' + icon('message-circle') + numberLabel(item.danmu)
+      : icon('thumbs-up') + numberLabel(item.likes);
+    var overlay = isBili ? '<div class="play-overlay"><i>' + icon('play') + '</i></div>' : '';
     return '<article class="work-card reveal" data-id="' + escapeHtml(item.id) + '" data-cat="' + escapeHtml(item.category) + '" role="button" tabindex="0" aria-label="查看：' + escapeHtml(item.title) + '">' +
       '<div class="work-card-media ' + (isBili ? 'card-16' : 'card-43') + '">' +
       '<img loading="lazy" src="' + escapeHtml(item.cover) + '" alt="">' +
-      '<span class="media-badge">' + (isBili ? '📺 B站' : '📕 小红书') + '</span>' + overlay +
+      '<span class="media-badge">' + (isBili ? icon('tv') + ' B站' : icon('book-heart') + ' 小红书') + '</span>' + overlay +
       '</div>' +
       '<div class="work-card-body">' +
       '<h3>' + escapeHtml(item.title) + '</h3>' +
       '<div class="work-card-meta">' +
-      '<span class="meta-pill">' + cat.emoji + ' ' + escapeHtml(item.category) + '</span>' +
+      '<span class="meta-pill">' + icon(categoryIcon(item.category)) + ' ' + escapeHtml(item.category) + '</span>' +
       '<span>' + meta + '</span>' +
-      (isBili && item.date ? '<span>' + escapeHtml(item.date) + '</span>' : '') +
+      (isBili && item.date ? '<span>' + icon('calendar') + escapeHtml(item.date) + '</span>' : '') +
       '</div>' +
       '</div></article>';
   }
@@ -175,13 +192,13 @@
   function buildFilters(containerId, items, gridId) {
     var counts = {};
     items.forEach(function (item) { counts[item.category] = (counts[item.category] || 0) + 1; });
-    var cats = [{ key: '全部', emoji: '💗', color: '#ff7bac' }].concat(DATA.categories.filter(function (c) {
+    var cats = [{ key: '全部', icon: 'sparkles', color: '#ff7bac' }].concat(DATA.categories.filter(function (c) {
       return counts[c.key] > 0;
     }));
     var box = $('#' + containerId);
     box.innerHTML = cats.map(function (c) {
       return '<button class="filter-chip" data-cat="' + escapeHtml(c.key) + '">' +
-        c.emoji + ' ' + escapeHtml(c.key) +
+        icon(c.key === '全部' ? 'sparkles' : categoryIcon(c.key)) + ' ' + escapeHtml(c.key) +
         (c.key === '全部' ? ' · ' + items.length : ' · ' + counts[c.key]) +
         '</button>';
     }).join('');
@@ -221,12 +238,12 @@
     $('#follow-cards').innerHTML =
       '<a class="follow-card" href="' + escapeHtml(meta.biliUrl) + '" target="_blank" rel="noopener noreferrer">' +
       '<img loading="lazy" src="' + escapeHtml(meta.biliAvatar) + '" alt="B站头像">' +
-      '<div><b>📺 小白超白的-</b><span>B站 · 粉丝 ' + escapeHtml(DATA.stats.bili.fans) + ' · 获赞 ' + escapeHtml(DATA.stats.bili.likes) +
-      '<br>播放 ' + escapeHtml(DATA.stats.bili.plays) + ' · 视频 ' + escapeHtml(DATA.stats.bili.videos) + '</span><em>去B站关注 ↗</em></div></a>' +
+      '<div><b>' + icon('tv') + ' 小白超白的-</b><span>B站 · 粉丝 ' + escapeHtml(DATA.stats.bili.fans) + ' · 获赞 ' + escapeHtml(DATA.stats.bili.likes) +
+      '<br>播放 ' + escapeHtml(DATA.stats.bili.plays) + ' · 视频 ' + escapeHtml(DATA.stats.bili.videos) + '</span><em>去B站关注 ' + icon('external-link') + '</em></div></a>' +
       '<a class="follow-card" href="' + escapeHtml(meta.xhsUrl) + '" target="_blank" rel="noopener noreferrer">' +
       '<img loading="lazy" src="' + escapeHtml(meta.avatar) + '" alt="小红书头像">' +
-      '<div><b>📕 小白超白的</b><span>小红书 · 粉丝 ' + escapeHtml(DATA.stats.xhs.followers) + ' · 获赞与收藏 ' +
-      escapeHtml(DATA.stats.xhs.likesAndCollects) + '<br>小红书号 ' + escapeHtml(DATA.stats.xhs.redId) + '</span><em>去小红书关注 ↗</em></div></a>';
+      '<div><b>' + icon('book-heart') + ' 小白超白的</b><span>小红书 · 粉丝 ' + escapeHtml(DATA.stats.xhs.followers) + ' · 获赞与收藏 ' +
+      escapeHtml(DATA.stats.xhs.likesAndCollects) + '<br>小红书号 ' + escapeHtml(DATA.stats.xhs.redId) + '</span><em>去小红书关注 ' + icon('external-link') + '</em></div></a>';
   }
 
   /* ============================================================
@@ -252,18 +269,18 @@
     var list = $('#search-results');
     var results = searchItems(q);
     if (!results.length) {
-      list.innerHTML = '<li class="search-empty">没找到对应作品，换个关键词试试：开箱 / GBC / chiikawa 💗</li>';
+      list.innerHTML = '<li class="search-empty">没找到对应作品，换个关键词试试：开箱 / GBC / chiikawa</li>';
       return;
     }
     list.innerHTML = results.map(function (entry) {
       var cat = categoryOf(entry.item);
       var meta = entry.kind === 'bili'
-        ? '▶ ' + numberLabel(entry.item.play) + ' · 💬 ' + numberLabel(entry.item.danmu)
-        : '👍 ' + numberLabel(entry.item.likes);
+        ? icon('play') + numberLabel(entry.item.play) + ' · ' + icon('message-circle') + numberLabel(entry.item.danmu)
+        : icon('thumbs-up') + numberLabel(entry.item.likes);
       return '<li data-id="' + escapeHtml(entry.item.id) + '">' +
         '<img loading="lazy" src="' + escapeHtml(entry.item.cover) + '" alt="">' +
         '<div class="search-result-main"><b>' + escapeHtml(entry.item.title) + '</b>' +
-        '<span>' + entry.platform + ' · ' + cat.emoji + ' ' + escapeHtml(entry.item.category) + ' · ' + meta + '</span></div></li>';
+        '<span>' + entry.platform + ' · ' + icon(categoryIcon(entry.item.category)) + ' ' + escapeHtml(entry.item.category) + ' · ' + meta + '</span></div></li>';
     }).join('');
     $$('#search-results li[data-id]').forEach(function (li) {
       li.addEventListener('click', function () {
@@ -296,24 +313,24 @@
     var cat = categoryOf(item);
     $('#detail-cover').src = item.cover || '';
     $('#detail-cover').alt = item.title || '作品封面';
-    $('#detail-cat').textContent = cat.emoji + ' ' + item.category;
+    $('#detail-cat').innerHTML = icon(categoryIcon(item.category)) + ' ' + escapeHtml(item.category);
     $('#detail-type').textContent = kind === 'bili' ? 'BILIBILI VIDEO' : 'XIAOHONGSHU POST';
     $('#detail-title').textContent = item.title || '小白作品';
     $('#detail-stats').innerHTML = kind === 'bili'
-      ? '<span class="detail-stat">▶ 播放 ' + escapeHtml(numberLabel(item.play)) + '</span>' +
-        '<span class="detail-stat">💬 弹幕 ' + escapeHtml(numberLabel(item.danmu)) + '</span>' +
-        (item.date ? '<span class="detail-stat">🗓️ ' + escapeHtml(item.date) + '</span>' : '')
-      : '<span class="detail-stat">👍 点赞 ' + escapeHtml(numberLabel(item.likes)) + '</span>' +
-        '<span class="detail-stat">📕 小红书号 ' + escapeHtml(DATA.stats.xhs.redId) + '</span>';
+      ? '<span class="detail-stat">' + icon('play') + ' 播放 ' + escapeHtml(numberLabel(item.play)) + '</span>' +
+        '<span class="detail-stat">' + icon('message-circle') + ' 弹幕 ' + escapeHtml(numberLabel(item.danmu)) + '</span>' +
+        (item.date ? '<span class="detail-stat">' + icon('calendar') + ' ' + escapeHtml(item.date) + '</span>' : '')
+      : '<span class="detail-stat">' + icon('thumbs-up') + ' 点赞 ' + escapeHtml(numberLabel(item.likes)) + '</span>' +
+        '<span class="detail-stat">' + icon('book-heart') + ' 小红书号 ' + escapeHtml(DATA.stats.xhs.redId) + '</span>';
     var link = $('#detail-link');
     if (item.url) {
       link.href = item.url;
       link.classList.remove('disabled');
-      link.textContent = '打开原作品 ↗';
+      link.innerHTML = icon('external-link') + ' 打开原作品';
     } else {
       link.href = '#';
       link.classList.add('disabled');
-      link.textContent = '暂未开放原链接 💗';
+      link.innerHTML = '暂未开放原链接 ' + icon('external-link');
     }
     $('#detail-modal').classList.add('open');
     $('#detail-modal').setAttribute('aria-hidden', 'false');
@@ -335,7 +352,7 @@
     var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
     var next = isDark ? 'day' : 'night';
     document.documentElement.setAttribute('data-theme', isDark ? '' : 'dark');
-    $('#theme-btn').textContent = isDark ? '🌙' : '☀️';
+    $('#theme-btn').innerHTML = isDark ? icon('moon') : icon('sun');
     if (window.XBW_BG && window.XBW_BG.setTheme) window.XBW_BG.setTheme(next);
   }
 
@@ -418,12 +435,12 @@
     if (!MusicBox.playing) {
       if (MusicBox.start()) {
         btn.classList.add('playing');
-        btn.textContent = '🎶';
+        btn.innerHTML = icon('music');
       }
     } else {
       MusicBox.stop();
       btn.classList.remove('playing');
-      btn.textContent = '🎵';
+      btn.innerHTML = icon('music');
     }
   }
 
@@ -501,7 +518,7 @@
       if (document.hidden && MusicBox.playing) {
         MusicBox.stop();
         $('#music-btn').classList.remove('playing');
-        $('#music-btn').textContent = '🎵';
+        $('#music-btn').innerHTML = icon('music');
       }
     });
   }

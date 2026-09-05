@@ -18,7 +18,7 @@ https://wqrnb.github.io/xiaobai-world/
 4. **B站视频墙**：42 支真实视频，播放 / 弹幕 / 日期
 5. **关注小白**：B站 / 小红书关注卡片
 
-支持搜索、日夜粉白主题切换、内置原创八音盒（默认关闭）。3D 背景为纯程序化生成（能量核心、粒子爆发、冲击波、星云、bloom），不加载任何纹理图片。
+支持搜索、日夜粉白主题切换、内置原创八音盒（默认关闭）。3D 背景为纯程序化生成（能量核心、粒子爆发、冲击波、星云、bloom），不加载任何纹理图片。界面图标使用本地打包的 Lucide 线性 SVG 图标，不使用 emoji。
 
 ## 本地运行
 
@@ -44,6 +44,7 @@ site/
 └─ assets/
    ├─ css/style.css
    ├─ js/data.js
+   ├─ js/icons.js
    ├─ js/three-bg.js
    ├─ js/app.js
    ├─ lib/              # Three.js r128 与 bloom 后处理
