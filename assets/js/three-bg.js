@@ -143,15 +143,15 @@
   /* ---------- 配色（日/夜 × 分区） ---------- */
   var PALETTES = {
     day: {
-      base: { skyTop: '#f6c8de', skyBottom: '#e070a6', nebula: '#f2aecd', halo: '#f5bdd6',
-        ocean: '#c9689b', land: '#dd2f7f', landEdge: '#d4699e', river: '#ffdce8',
-        grid: '#ff4f9b', cloud: '#ffd0e0', rim: '#ffd6e6', label: '#ff3f8e',
-        exposure: 0.7, bloom: 0.3, threshold: 0.8, gridOp: 0.3, starsOp: 0.35, nebOp: 0.2, haloOp: 0.12, pillarOp: 0.1 },
+      base: { skyTop: '#ffe4f1', skyBottom: '#f7a8c8', nebula: '#f7c6de', halo: '#f7c2d8',
+        ocean: '#f7a5c8', land: '#ff5ca8', landEdge: '#ffb3d0', river: '#ffe4f0',
+        grid: '#ff4f9b', cloud: '#ffd6e8', rim: '#ffe4f0', label: '#ff3f8e',
+        exposure: 0.72, bloom: 0.3, threshold: 0.8, gridOp: 0.34, starsOp: 0.4, nebOp: 0.22, haloOp: 0.14, pillarOp: 0.12 },
       about:   {},
-      featured: { grid: '#ff2e85', land: '#d92b7b' },
-      xhs:     { grid: '#ff1f78', skyBottom: '#d4548e', land: '#d11f74' },
-      bili:    { grid: '#ff5c9b', skyTop: '#f2bcd6' },
-      follow:  { grid: '#ff6fa8', skyTop: '#f6c8de' }
+      featured: { grid: '#ff2e85', land: '#ff54a0' },
+      xhs:     { grid: '#ff1f78', skyBottom: '#f29ac2', land: '#ff4396' },
+      bili:    { grid: '#ff5c9b', skyTop: '#ffe0ee' },
+      follow:  { grid: '#ff6fa8', skyTop: '#ffeaf4' }
     },
     night: {
       base: { skyTop: '#1c0614', skyBottom: '#64163f', nebula: '#5a1036', halo: '#f53f8b',
@@ -384,7 +384,7 @@
         '  vec3 col = mix(uOcean, uLand, land);',
         '  col = mix(col, uLandEdge, edge*0.85);',
         '  col += uRiver * rivers * (1.5 + uPulse*2.2);',
-        '  float shade = 0.30 + 0.70*max(dot(n, normalize(vec3(0.35, 0.75, 0.56))), 0.0);',
+        '  float shade = 0.55 + 0.45*max(dot(n, normalize(vec3(0.35, 0.75, 0.56))), 0.0);',
         '  col *= shade;',
         '  float fres = pow(1.0 - abs(dot(n, normalize(vV))), 2.3);',
         '  col += uRim * (fres*0.35 + uPulse*0.45);',
