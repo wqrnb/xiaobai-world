@@ -143,21 +143,21 @@
   /* ---------- 配色（日/夜 × 分区） ---------- */
   var PALETTES = {
     day: {
-      base: { skyTop: '#ffe4f1', skyBottom: '#f7a8c8', nebula: '#f7c6de', halo: '#f7c2d8',
-        ocean: '#f7a5c8', land: '#ff5ca8', landEdge: '#ffb3d0', river: '#ffe4f0',
-        grid: '#ff4f9b', cloud: '#ffd6e8', rim: '#ffe4f0', label: '#ff3f8e',
-        exposure: 0.72, bloom: 0.3, threshold: 0.8, gridOp: 0.34, starsOp: 0.4, nebOp: 0.22, haloOp: 0.14, pillarOp: 0.12 },
+      base: { skyTop: '#dda2c2', skyBottom: '#e87ba9', nebula: '#eeb3d0', halo: '#f5bcd6',
+        ocean: '#ff92c4', land: '#ff59a6', landEdge: '#ff9ecb', river: '#ffd6e6',
+        grid: '#ff4f9b', cloud: '#ffb0d0', rim: '#ffd6e6', label: '#ff3f8e',
+        exposure: 0.34, bloom: 0.3, threshold: 0.8, gridOp: 0.3, starsOp: 0.3, nebOp: 0.16, haloOp: 0.12, pillarOp: 0.12 },
       about:   {},
-      featured: { grid: '#ff2e85', land: '#ff54a0' },
-      xhs:     { grid: '#ff1f78', skyBottom: '#f29ac2', land: '#ff4396' },
-      bili:    { grid: '#ff5c9b', skyTop: '#ffe0ee' },
-      follow:  { grid: '#ff6fa8', skyTop: '#ffeaf4' }
+      featured: { grid: '#ff2e85', land: '#ff62a8' },
+      xhs:     { grid: '#ff1f78', skyBottom: '#e06c9f', land: '#ff529b' },
+      bili:    { grid: '#ff5c9b', skyTop: '#db9cbe' },
+      follow:  { grid: '#ff6fa8', skyTop: '#e0a5c6' }
     },
     night: {
       base: { skyTop: '#1c0614', skyBottom: '#64163f', nebula: '#5a1036', halo: '#f53f8b',
-        ocean: '#3f0c29', land: '#ed3d82', landEdge: '#7e1443', river: '#ffaed0',
+        ocean: '#8a2260', land: '#ff4f9d', landEdge: '#b03a78', river: '#ffaed0',
         grid: '#ff4f9b', cloud: '#ff7db4', rim: '#ff74ac', label: '#ff74ac',
-        exposure: 0.95, bloom: 0.6, threshold: 0.62, gridOp: 0.48, starsOp: 0.75, nebOp: 0.55, haloOp: 0.45, pillarOp: 0.26 },
+        exposure: 0.45, bloom: 0.6, threshold: 0.62, gridOp: 0.48, starsOp: 0.7, nebOp: 0.3, haloOp: 0.28, pillarOp: 0.26 },
       about:   {},
       featured: { grid: '#ff5fa6' },
       xhs:     { grid: '#ff2e85', skyBottom: '#701843' },
@@ -185,7 +185,7 @@
   /* ---------- 构建场景 ---------- */
   function buildScene() {
     try {
-      renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: !IS_SMALL, powerPreference: 'high-performance' });
+      renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: !IS_SMALL, powerPreference: 'high-performance', preserveDrawingBuffer: true });
       renderer.setPixelRatio(Q.pixelRatio);
       renderer.setSize(window.innerWidth, window.innerHeight);
       renderer.outputEncoding = THREE.sRGBEncoding;
@@ -251,15 +251,17 @@
         '  float w1 = 0.55+0.45*sin(vPos.x*0.045 + uTime*0.16 + sin(vPos.z*0.05+uTime*0.07)*1.6);',
         '  float w2 = 0.55+0.45*sin(-vPos.x*0.06 + uTime*0.11 + vPos.z*0.02);',
         '  float w3 = 0.5+0.5*sin(vPos.z*0.05 - uTime*0.09);',
-        '  col += uAurora * (b1*w1*0.35 + b2*w2*0.4 + b3*w3*0.22);',
-        '  col += uAurora * 0.08 * (0.5+0.5*sin(vPos.y*0.09 - uTime*0.05));',
+        '  col += uAurora * (b1*w1*0.25 + b2*w2*0.3 + b3*w3*0.15);',
+        '  col += uAurora * 0.06 * (0.5+0.5*sin(vPos.y*0.09 - uTime*0.05));',
         '  gl_FragColor = vec4(col, 1.0);',
         '  #include <tonemapping_fragment>',
         '  #include <encodings_fragment>',
         '}'
       ].join('\n')
     });
-    scene.add(new THREE.Mesh(new THREE.SphereGeometry(60, 48, 24), skyMat));
+    var skyMesh = new THREE.Mesh(new THREE.SphereGeometry(60, 48, 24), skyMat);
+    skyMesh.name = 'sky';
+    scene.add(skyMesh);
 
     // 星空（细密、低对比，保证整体明亮）
     var starPos = new Float32Array(Q.stars * 3);
@@ -304,6 +306,7 @@
       blending: THREE.AdditiveBlending, depthWrite: false
     });
     var halo = new THREE.Sprite(haloMat);
+    halo.name = 'halo';
     halo.scale.set(34, 34, 1);
     scene.add(halo);
   }
@@ -330,6 +333,7 @@
       ].join('\n')
     });
     atmoMesh = new THREE.Mesh(new THREE.SphereGeometry(R * 1.24, 64, 40), atmoMat);
+    atmoMesh.name = 'atmo';
     atmoMesh.renderOrder = 3;
     planetGroup.add(atmoMesh);
 
@@ -384,7 +388,7 @@
         '  vec3 col = mix(uOcean, uLand, land);',
         '  col = mix(col, uLandEdge, edge*0.85);',
         '  col += uRiver * rivers * (1.5 + uPulse*2.2);',
-        '  float shade = 0.55 + 0.45*max(dot(n, normalize(vec3(0.35, 0.75, 0.56))), 0.0);',
+        '  float shade = 0.62 + 0.38*max(dot(n, normalize(vec3(0.35, 0.75, 0.56))), 0.0);',
         '  col *= shade;',
         '  float fres = pow(1.0 - abs(dot(n, normalize(vV))), 2.3);',
         '  col += uRim * (fres*0.35 + uPulse*0.45);',
@@ -395,6 +399,7 @@
       ].join('\n')
     });
     surfaceMesh = new THREE.Mesh(new THREE.SphereGeometry(R, Q.planetSeg, Math.round(Q.planetSeg * 0.66)), surfaceMat);
+    surfaceMesh.name = 'surface';
     planetGroup.add(surfaceMesh);
 
     // 发光经纬网格
@@ -469,6 +474,7 @@
       ].join('\n')
     });
     cloudMesh = new THREE.Mesh(new THREE.SphereGeometry(R * 1.045, IS_SMALL ? 40 : 56, IS_SMALL ? 26 : 36), cloudMat);
+    cloudMesh.name = 'cloud';
     cloudMesh.renderOrder = 2;
     planetGroup.add(cloudMesh);
   }
@@ -476,6 +482,7 @@
   /* 粒子星环 + 漂浮水晶 + 光柱 */
   function buildRingAndOrbits() {
     var ringGroup = new THREE.Group();
+    ringGroup.name = 'ring';
     ringGroup.rotation.x = -0.30;               // 轻微倾斜，像行星环
     planetGroup.add(ringGroup);
 
@@ -491,7 +498,7 @@
         '  float ang = vUv.x*6.28318;',
         '  float clump = 0.6 + 0.4*sin(ang*7.0 + uTime*0.05)*sin(ang*3.0 - uTime*0.03);',
         '  a *= 0.55 + 0.45*clump;',
-        '  gl_FragColor = vec4(uColor, a*0.5);',
+        '  gl_FragColor = vec4(uColor, a*0.2);',
         '  #include <tonemapping_fragment>',
         '  #include <encodings_fragment>',
         '}'
@@ -512,8 +519,8 @@
     var rGeo = new THREE.BufferGeometry();
     rGeo.setAttribute('position', new THREE.BufferAttribute(rp, 3));
     var rMat = new THREE.PointsMaterial({
-      size: IS_SMALL ? 0.09 : 0.11, map: glowTex, color: 0xffd9e9,
-      transparent: true, opacity: 0.85, blending: THREE.AdditiveBlending, depthWrite: false, sizeAttenuation: true
+      size: IS_SMALL ? 0.07 : 0.08, map: glowTex, color: 0xffd9e9,
+      transparent: true, opacity: 0.45, blending: THREE.AdditiveBlending, depthWrite: false, sizeAttenuation: true
     });
     ringPoints = new THREE.Points(rGeo, rMat);
     ringGroup.add(ringPoints);
@@ -1179,7 +1186,7 @@
     gridMat.color.copy(cur.grid).multiplyScalar(1.8);
     equatorMat.opacity = cur.gridOp * 1.1;
     equatorMat.color.copy(cur.river).multiplyScalar(1.8);
-    ringMat.uniforms.uColor.value.copy(cur.rim).multiplyScalar(1.5);
+    ringMat.uniforms.uColor.value.copy(cur.rim).multiplyScalar(1.0);
     starsMat.opacity = cur.starsOp;
     haloMat.opacity = cur.haloOp;
     pillarMat.opacity = cur.pillarOp;
