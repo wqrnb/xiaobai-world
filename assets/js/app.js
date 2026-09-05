@@ -110,14 +110,15 @@
   /* ============================================================
    * 3. 作品卡片
    * ============================================================ */
-  function workCardHtml(item, kind) {
+  function workCardHtml(item, kind, index) {
     var cat = categoryOf(item);
     var isBili = kind === 'bili';
+    var delay = Math.min(0.32, 0.03 + ((index || 0) % 10) * 0.035);
     var meta = isBili
       ? icon('play') + numberLabel(item.play) + ' · ' + icon('message-circle') + numberLabel(item.danmu)
       : icon('thumbs-up') + numberLabel(item.likes);
     var overlay = isBili ? '<div class="play-overlay"><i>' + icon('play') + '</i></div>' : '';
-    return '<article class="work-card reveal" data-id="' + escapeHtml(item.id) + '" data-cat="' + escapeHtml(item.category) + '" role="button" tabindex="0" aria-label="查看：' + escapeHtml(item.title) + '">' +
+    return '<article class="work-card reveal" style="--d:' + delay.toFixed(3) + 's" data-id="' + escapeHtml(item.id) + '" data-cat="' + escapeHtml(item.category) + '" role="button" tabindex="0" aria-label="查看：' + escapeHtml(item.title) + '">' +
       '<div class="work-card-media ' + (isBili ? 'card-16' : 'card-43') + '">' +
       '<img loading="lazy" src="' + escapeHtml(item.cover) + '" alt="">' +
       '<span class="media-badge">' + (isBili ? icon('tv') + ' B站' : icon('book-heart') + ' 小红书') + '</span>' + overlay +
@@ -147,8 +148,8 @@
   }
 
   function renderCards(container, items, kind) {
-    container.innerHTML = items.map(function (item) {
-      return workCardHtml(item, kind);
+    container.innerHTML = items.map(function (item, index) {
+      return workCardHtml(item, kind, index);
     }).join('');
     $$('#' + container.id + ' .work-card').forEach(bindCard);
   }
@@ -180,8 +181,8 @@
       });
     }
 
-    $('#featured-scroller').innerHTML = featured.map(function (entry) {
-      return workCardHtml(entry.item, entry.kind);
+    $('#featured-scroller').innerHTML = featured.map(function (entry, index) {
+      return workCardHtml(entry.item, entry.kind, index);
     }).join('');
     $$('#featured-scroller .work-card').forEach(bindCard);
   }
@@ -453,6 +454,9 @@
     var y = window.scrollY || window.pageYOffset;
     $('#topbar').classList.toggle('scrolled', y > 30);
     $('#back-top').classList.toggle('show', y > 700);
+
+    var max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+    $('#scroll-progress-bar').style.width = Math.min(100, y / max * 100).toFixed(2) + '%';
 
     var current = 'about';
     for (var i = 0; i < sectionIds.length; i++) {

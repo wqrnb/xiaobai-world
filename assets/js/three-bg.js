@@ -54,6 +54,19 @@
   var scrollP = 0;
   var theme = 'day';
   var burstVelocities = null;
+  var sectionKeys = ['about', 'featured', 'xhs', 'bili', 'follow'];
+  var currentSection = 'about';
+  var sectionColors = null;
+  var sectionTargets = null;
+  var pointerTarget = { x: 0, y: 0 };
+  var pointer = { x: 0, y: 0 };
+  var lastScrollY = 0;
+  var scrollVel = 0;
+  var warpT = 0;
+  var warpDuration = 1.05;
+  var warpActive = false;
+  var warpBaseZ = 0;
+  var baseFov = 58;
 
   try {
     renderer = new THREE.WebGLRenderer({
@@ -432,9 +445,23 @@
     requestAnimationFrame(animate);
     var dt = Math.min(clock.getDelta(), 0.05);
     var t = clock.elapsedTime;
+    var rawY = window.scrollY || 0;
+    var rawVel = (rawY - lastScrollY) / Math.max(dt, 0.001);
+    lastScrollY = rawY;
+    scrollVel += (rawVel - scrollVel) * Math.min(1, dt * 5);
     scrollP = Math.min(1, Math.max(0,
-      (window.scrollY || 0) / Math.max(1, document.documentElement.scrollHeight - window.innerHeight)
+      rawY / Math.max(1, document.documentElement.scrollHeight - window.innerHeight)
     ));
+    var speedK = Math.min(1, Math.abs(scrollVel) / 320);
+    pointer.x += (pointerTarget.x - pointer.x) * Math.min(1, dt * 3.4);
+    pointer.y += (pointerTarget.y - pointer.y) * Math.min(1, dt * 3.4);
+
+    if (warpActive) {
+      warpT += dt;
+      if (warpT >= warpDuration) warpActive = false;
+    }
+    var warpK = warpActive ? Math.min(1, warpT / warpDuration) : 1;
+    var warpPulse = warpActive ? Math.sin(warpK * Math.PI) : 0;
 
     if (introPhase === 'charge') {
       introT += dt;
@@ -456,8 +483,8 @@
         shake = 0;
       }
     } else if (introPhase === 'ambient') {
-      coreGroup.scale.setScalar(1.22 + Math.sin(t * 1.5) * 0.07);
-      coreUniforms.uIntensity.value = 1.25 + Math.sin(t * 1.3) * 0.12;
+      coreGroup.scale.setScalar(1.22 + Math.sin(t * 1.5) * 0.07 + warpPulse * 0.42 + speedK * 0.08);
+      coreUniforms.uIntensity.value = 1.25 + Math.sin(t * 1.3) * 0.12 + speedK * 0.35 + warpPulse * 0.65;
       updateBurst(dt);
       updateWaves(dt);
     } else {
@@ -466,16 +493,19 @@
     }
 
     coreUniforms.uTime.value = t;
-    coreMesh.rotation.y += dt * (0.28 + scrollP * 0.45);
-    coreMesh.rotation.x += dt * 0.12;
-    coreWire.rotation.y -= dt * 0.35;
+    coreMesh.rotation.y += dt * (0.28 + scrollP * 0.45 + speedK * 0.55);
+    coreMesh.rotation.x += dt * (0.12 + speedK * 0.25);
+    coreWire.rotation.y -= dt * (0.35 + speedK * 0.6);
     coreWire.rotation.z += dt * 0.16;
-    coreGroup.position.y = 0.15 - scrollP * 2.2;
-    coreGroup.position.x = Math.sin(scrollP * Math.PI * 1.5) * 1.1;
+    coreGroup.position.y = 0.15 - scrollP * 2.2 + pointer.y * 0.45;
+    coreGroup.position.x = Math.sin(scrollP * Math.PI * 1.5) * 1.1 + pointer.x * 0.7;
 
-    stars.rotation.y += dt * (0.008 + scrollP * 0.02);
-    ambientPoints.rotation.y += dt * (0.06 + scrollP * 0.12);
-    ambientPoints.position.y = -scrollP * 1.4;
+    stars.rotation.y += dt * (0.008 + scrollP * 0.02 + speedK * 0.16);
+    stars.rotation.x += dt * speedK * 0.08;
+    var starStretch = 1 + speedK * 0.35 + warpPulse * 0.5;
+    stars.scale.set(starStretch, starStretch, 1 + speedK * 3.5 + warpPulse * 2.2);
+    ambientPoints.rotation.y += dt * (0.06 + scrollP * 0.12 + speedK * 0.5);
+    ambientPoints.position.y = -scrollP * 1.4 + pointer.y * 0.3;
 
     scene.children.forEach(function (obj) {
       if (obj.userData && obj.userData.isNebula) {
@@ -485,13 +515,34 @@
       }
     });
 
-    // 相机：随滚动缓慢后拉 + 轻微爆炸震动
-    var camZ = 11 + scrollP * 1.8;
-    var camY = -scrollP * 1.2;
-    var sx = shake > 0 ? (Math.random() - 0.5) * shake * 0.35 : 0;
-    var sy = shake > 0 ? (Math.random() - 0.5) * shake * 0.35 : 0;
-    camera.position.set(sx, camY + sy, camZ);
-    camera.lookAt(0, 0.1 - scrollP * 2.4, 0);
+    // 分幕色彩渐变
+    if (sectionColors && sectionTargets) {
+      var colorK = Math.min(1, dt * 2.6);
+      sectionColors.skyTop.lerp(sectionTargets.skyTop, colorK);
+      sectionColors.skyBottom.lerp(sectionTargets.skyBottom, colorK);
+      sectionColors.deep.lerp(sectionTargets.deep, colorK);
+      sectionColors.hot.lerp(sectionTargets.hot, colorK);
+      sectionColors.white.lerp(sectionTargets.white, colorK);
+      sectionColors.rim.lerp(sectionTargets.rim, colorK);
+      skyMat.uniforms.uTop.value.copy(sectionColors.skyTop);
+      skyMat.uniforms.uBottom.value.copy(sectionColors.skyBottom);
+      coreUniforms.uDeep.value.copy(sectionColors.deep);
+      coreUniforms.uHot.value.copy(sectionColors.hot);
+      coreUniforms.uWhite.value.copy(sectionColors.white);
+      coreUniforms.uRim.value.copy(sectionColors.rim);
+    }
+
+    // 相机：滚动后拉 + 分幕跃迁 + 指针视差 + 爆炸震动
+    var camZ = 11 + scrollP * 1.8 + warpPulse * 6.2;
+    var camY = -scrollP * 1.2 + pointer.y * 0.55;
+    var camX = pointer.x * 0.65;
+    var fov = baseFov + speedK * 5 - warpPulse * 7;
+    camera.fov += (fov - camera.fov) * Math.min(1, dt * 7);
+    camera.updateProjectionMatrix();
+    var sx = camX + (shake > 0 ? (Math.random() - 0.5) * shake * 0.35 : 0);
+    var sy = camY + (shake > 0 ? (Math.random() - 0.5) * shake * 0.35 : 0);
+    camera.position.set(sx, sy, camZ);
+    camera.lookAt(pointer.x * 0.3, 0.1 - scrollP * 2.4 + pointer.y * 0.2, 0);
 
     skyMat.uniforms.uTime.value = t;
 
@@ -512,33 +563,84 @@
     if (composer) composer.setSize(w, h);
   }
 
-  function setTheme(next) {
-    theme = next || 'day';
-    if (theme === 'dark') {
-      skyMat.uniforms.uTop.value.set('#1a0712');
-      skyMat.uniforms.uBottom.value.set('#541131');
-      coreUniforms.uDeep.value.set('#4d0d2c');
-      coreUniforms.uHot.value.set('#ff5fa8');
-      coreUniforms.uWhite.value.set('#fff0f6');
-      coreUniforms.uRim.value.set('#ff8fbd');
-      starsMat.opacity = 1.0;
-      if (bloomPass) {
-        bloomPass.strength = 0.58;
-        bloomPass.threshold = 0.62;
-      }
-    } else {
-      skyMat.uniforms.uTop.value.set('#ffc4da');
-      skyMat.uniforms.uBottom.value.set('#f76d9e');
-      coreUniforms.uDeep.value.set('#b01f5b');
-      coreUniforms.uHot.value.set('#ff4f93');
-      coreUniforms.uWhite.value.set('#fff6fa');
-      coreUniforms.uRim.value.set('#ff9cc6');
-      starsMat.opacity = 0.55;
-      if (bloomPass) {
-        bloomPass.strength = 0.4;
-        bloomPass.threshold = 0.9;
+  var SECTION_PALETTES = {
+    day: {
+      about: { skyTop: '#ffc4da', skyBottom: '#f76d9e', deep: '#b01f5b', hot: '#ff4f93', white: '#fff6fa', rim: '#ff9cc6', bloom: 0.4, threshold: 0.9 },
+      featured: { skyTop: '#ffd3e4', skyBottom: '#ff7bac', deep: '#a31355', hot: '#ff2f7e', white: '#fff1f6', rim: '#ff8fbd', bloom: 0.42, threshold: 0.88 },
+      xhs: { skyTop: '#ffc9dc', skyBottom: '#f45197', deep: '#9c0f4d', hot: '#ff5c8d', white: '#fff5f8', rim: '#ff7bac', bloom: 0.45, threshold: 0.86 },
+      bili: { skyTop: '#ffdcec', skyBottom: '#ff6b9d', deep: '#8f1550', hot: '#ff4f93', white: '#fff7fa', rim: '#ffa3c6', bloom: 0.42, threshold: 0.87 },
+      follow: { skyTop: '#fff0f5', skyBottom: '#ff8fb8', deep: '#a31355', hot: '#ff7bac', white: '#ffffff', rim: '#ffc0d8', bloom: 0.4, threshold: 0.9 }
+    },
+    night: {
+      about: { skyTop: '#1a0712', skyBottom: '#541131', deep: '#4d0d2c', hot: '#ff5fa8', white: '#fff0f6', rim: '#ff8fbd', bloom: 0.58, threshold: 0.62 },
+      featured: { skyTop: '#180611', skyBottom: '#611438', deep: '#420a28', hot: '#ff3f86', white: '#ffe6f0', rim: '#ff7bac', bloom: 0.6, threshold: 0.6 },
+      xhs: { skyTop: '#1c0713', skyBottom: '#6d153f', deep: '#3d0a24', hot: '#ff4f93', white: '#ffedf4', rim: '#ff6fa8', bloom: 0.62, threshold: 0.58 },
+      bili: { skyTop: '#150610', skyBottom: '#5c1235', deep: '#360920', hot: '#ff5c8d', white: '#fff2f7', rim: '#ff8fbd', bloom: 0.6, threshold: 0.6 },
+      follow: { skyTop: '#1d0813', skyBottom: '#6d1843', deep: '#4a0c2c', hot: '#ff7bac', white: '#fff6f9', rim: '#ffb1cf', bloom: 0.56, threshold: 0.62 }
+    }
+  };
+  var COLOR_KEYS = ['skyTop', 'skyBottom', 'deep', 'hot', 'white', 'rim'];
+
+  function initSectionColors() {
+    sectionColors = {};
+    sectionTargets = {};
+    COLOR_KEYS.forEach(function (key) {
+      sectionColors[key] = new THREE.Color('#ffc4da');
+      sectionTargets[key] = new THREE.Color('#ffc4da');
+    });
+  }
+
+  function getCurrentSection() {
+    var current = 'about';
+    for (var i = 0; i < sectionKeys.length; i++) {
+      var el = document.getElementById(sectionKeys[i]);
+      if (el && el.getBoundingClientRect().top <= window.innerHeight * 0.5) {
+        current = sectionKeys[i];
       }
     }
+    return current;
+  }
+
+  function setSectionTarget(section) {
+    var palette = SECTION_PALETTES[theme][section] || SECTION_PALETTES[theme].about;
+    sectionTargets.skyTop.set(palette.skyTop);
+    sectionTargets.skyBottom.set(palette.skyBottom);
+    sectionTargets.deep.set(palette.deep);
+    sectionTargets.hot.set(palette.hot);
+    sectionTargets.white.set(palette.white);
+    sectionTargets.rim.set(palette.rim);
+    if (bloomPass) {
+      bloomPass.strength = palette.bloom;
+      bloomPass.threshold = palette.threshold;
+    }
+  }
+
+  function updateSectionState(force) {
+    var section = getCurrentSection();
+    if (section === currentSection && !force) return;
+    currentSection = section;
+    setSectionTarget(section);
+    if (force) return;
+    if (introPhase === 'ambient') startWarp();
+  }
+
+  function startWarp() {
+    warpActive = true;
+    warpT = 0;
+    warpBaseZ = 11 + scrollP * 1.8;
+    shake = Math.max(shake, 0.24);
+    coreUniforms.uRipple.value = Math.max(coreUniforms.uRipple.value, 0.55);
+    if (flashEl) {
+      flashEl.classList.remove('warp');
+      void flashEl.offsetWidth;
+      flashEl.classList.add('warp');
+    }
+  }
+
+  function setTheme(next) {
+    theme = next || 'day';
+    setSectionTarget(currentSection);
+    starsMat.opacity = theme === 'dark' ? 1.0 : 0.55;
   }
 
   api.start = function () {
@@ -558,7 +660,9 @@
   api.setTheme = setTheme;
 
   buildScene();
+  initSectionColors();
   setTheme('day');
+  updateSectionState(true);
   api.debug = {
     renderer: renderer,
     scene: scene,
@@ -570,6 +674,11 @@
     scrollP = Math.min(1, Math.max(0,
       (window.scrollY || 0) / Math.max(1, document.documentElement.scrollHeight - window.innerHeight)
     ));
+      updateSectionState();
   }, { passive: true });
+    window.addEventListener('pointermove', function (e) {
+      pointerTarget.x = (e.clientX / Math.max(1, window.innerWidth)) * 2 - 1;
+      pointerTarget.y = (e.clientY / Math.max(1, window.innerHeight)) * 2 - 1;
+    }, { passive: true });
   animate();
 })();

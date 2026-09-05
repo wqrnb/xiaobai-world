@@ -142,6 +142,16 @@ img {
   animation: intro-flash-boom 0.9s var(--ease) forwards;
 }
 
+.intro-flash.warp {
+  animation: chapter-warp 0.55s var(--ease) forwards;
+}
+
+@keyframes chapter-warp {
+  0% { opacity: 0; transform: scale(0.8); }
+  22% { opacity: 0.55; transform: scale(1.06); }
+  100% { opacity: 0; transform: scale(1.35); }
+}
+
 @keyframes intro-flash-boom {
   0% { opacity: 0; transform: scale(0.65); }
   14% { opacity: 1; transform: scale(1.12); }
@@ -326,6 +336,25 @@ img {
   width: 13px;
   height: 13px;
   vertical-align: -2px;
+}
+
+.scroll-progress {
+  position: fixed;
+  z-index: 70;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  pointer-events: none;
+}
+
+.scroll-progress i {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: 0 999px 999px 0;
+  background: linear-gradient(90deg, var(--pink-2), var(--pink), #fff);
+  box-shadow: 0 0 12px rgba(255, 92, 141, 0.7);
 }
 
 /* ---------- 顶部导航 ---------- */
@@ -839,6 +868,16 @@ main {
 .reveal.in {
   opacity: 1;
   transform: none;
+}
+
+.section-head.reveal {
+  transform: translateY(42px) scale(0.94);
+  clip-path: inset(0 0 100% 0);
+}
+
+.section-head.reveal.in {
+  transform: none;
+  clip-path: inset(0 0 0% 0);
 }
 
 /* ---------- 精选 scroller ---------- */
