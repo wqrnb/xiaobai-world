@@ -105,7 +105,10 @@
 			this.materialCopy = new THREE.ShaderMaterial( {
 				uniforms: this.copyUniforms,
 				vertexShader: copyShader.vertexShader,
-				fragmentShader: copyShader.fragmentShader,
+				fragmentShader: copyShader.fragmentShader.replace(
+					'gl_FragColor = opacity * texel;',
+					'gl_FragColor = opacity * texel;\n\tgl_FragColor = linearToOutputTexel( gl_FragColor );'
+				),
 				blending: THREE.AdditiveBlending,
 				depthTest: false,
 				depthWrite: false,

@@ -25,7 +25,9 @@
     coarse: IS_COARSE,
     reduced: REDUCED,
     pixelRatio: IS_COARSE ? 1 : Math.min(window.devicePixelRatio || 1, 2),
-    bloom: !IS_SMALL && !REDUCED,
+    // r128 的 UnrealBloomPass 对自定义 ShaderMaterial 的 composer 管线会双重 tone mapping 压黑，
+    // 场景已用大量加法发光元素（网格/河流/节点/光晕/星云）替代后处理 bloom。
+    bloom: false,
     stars: IS_SMALL ? 260 : 560,
     ringParticles: IS_SMALL ? 460 : 1000,
     burstParticles: IS_SMALL ? 420 : 1200,
@@ -141,21 +143,21 @@
   /* ---------- 配色（日/夜 × 分区） ---------- */
   var PALETTES = {
     day: {
-      base: { skyTop: '#f9c6de', skyBottom: '#e2609b', nebula: '#f5a9c9', halo: '#f5b3d1',
-        ocean: '#da7bab', land: '#e93e8e', landEdge: '#e87bab', river: '#ffe9f2',
-        grid: '#ff5c9b', cloud: '#ffd9e8', rim: '#ffe4f0', label: '#ff4f9b',
-        exposure: 0.72, bloom: 0.22, threshold: 0.85, gridOp: 0.36, starsOp: 0.45, nebOp: 0.26, haloOp: 0.16, pillarOp: 0.12 },
+      base: { skyTop: '#f6c8de', skyBottom: '#e070a6', nebula: '#f2aecd', halo: '#f5bdd6',
+        ocean: '#c9689b', land: '#dd2f7f', landEdge: '#d4699e', river: '#ffdce8',
+        grid: '#ff4f9b', cloud: '#ffd0e0', rim: '#ffd6e6', label: '#ff3f8e',
+        exposure: 0.7, bloom: 0.3, threshold: 0.8, gridOp: 0.3, starsOp: 0.35, nebOp: 0.2, haloOp: 0.12, pillarOp: 0.1 },
       about:   {},
-      featured: { grid: '#ff3f8e', land: '#ec3a8a' },
-      xhs:     { grid: '#ff2e85', skyBottom: '#d9548e', land: '#e52f84' },
-      bili:    { grid: '#ff6ba4', skyTop: '#f8c3db' },
-      follow:  { grid: '#ff82b4', skyTop: '#fbd0e2' }
+      featured: { grid: '#ff2e85', land: '#d92b7b' },
+      xhs:     { grid: '#ff1f78', skyBottom: '#d4548e', land: '#d11f74' },
+      bili:    { grid: '#ff5c9b', skyTop: '#f2bcd6' },
+      follow:  { grid: '#ff6fa8', skyTop: '#f6c8de' }
     },
     night: {
       base: { skyTop: '#1c0614', skyBottom: '#64163f', nebula: '#5a1036', halo: '#f53f8b',
         ocean: '#3f0c29', land: '#ed3d82', landEdge: '#7e1443', river: '#ffaed0',
         grid: '#ff4f9b', cloud: '#ff7db4', rim: '#ff74ac', label: '#ff74ac',
-        exposure: 0.9, bloom: 0.5, threshold: 0.66, gridOp: 0.48, starsOp: 0.75, nebOp: 0.55, haloOp: 0.45, pillarOp: 0.26 },
+        exposure: 0.95, bloom: 0.6, threshold: 0.62, gridOp: 0.48, starsOp: 0.75, nebOp: 0.55, haloOp: 0.45, pillarOp: 0.26 },
       about:   {},
       featured: { grid: '#ff5fa6' },
       xhs:     { grid: '#ff2e85', skyBottom: '#701843' },
@@ -249,9 +251,11 @@
         '  float w1 = 0.55+0.45*sin(vPos.x*0.045 + uTime*0.16 + sin(vPos.z*0.05+uTime*0.07)*1.6);',
         '  float w2 = 0.55+0.45*sin(-vPos.x*0.06 + uTime*0.11 + vPos.z*0.02);',
         '  float w3 = 0.5+0.5*sin(vPos.z*0.05 - uTime*0.09);',
-        '  col += uAurora * (b1*w1*0.7 + b2*w2*0.6 + b3*w3*0.35);',
-        '  col += uAurora * 0.15 * (0.5+0.5*sin(vPos.y*0.09 - uTime*0.05));',
+        '  col += uAurora * (b1*w1*0.35 + b2*w2*0.4 + b3*w3*0.22);',
+        '  col += uAurora * 0.08 * (0.5+0.5*sin(vPos.y*0.09 - uTime*0.05));',
         '  gl_FragColor = vec4(col, 1.0);',
+        '  #include <tonemapping_fragment>',
+        '  #include <encodings_fragment>',
         '}'
       ].join('\n')
     });
@@ -300,7 +304,7 @@
       blending: THREE.AdditiveBlending, depthWrite: false
     });
     var halo = new THREE.Sprite(haloMat);
-    halo.scale.set(44, 44, 1);
+    halo.scale.set(34, 34, 1);
     scene.add(halo);
   }
 
@@ -314,7 +318,16 @@
       side: THREE.BackSide, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
       uniforms: { uRim: { value: cur.rim } },
       vertexShader: 'varying vec3 vN; varying vec3 vV; void main(){ vN=normalize(normalMatrix*normal); vec4 mv=modelViewMatrix*vec4(position,1.0); vV=normalize(-mv.xyz); gl_Position=projectionMatrix*mv; }',
-      fragmentShader: 'varying vec3 vN; varying vec3 vV; uniform vec3 uRim; void main(){ float f=pow(clamp(0.72-abs(dot(normalize(vN),normalize(vV))),0.0,1.0),2.4); gl_FragColor=vec4(uRim, f*0.6); }'
+      fragmentShader: [
+        'varying vec3 vN; varying vec3 vV;',
+        'uniform vec3 uRim;',
+        'void main(){',
+        '  float f=pow(clamp(0.72-abs(dot(normalize(vN),normalize(vV))),0.0,1.0),2.4);',
+        '  gl_FragColor=vec4(uRim, f*0.6);',
+        '  #include <tonemapping_fragment>',
+        '  #include <encodings_fragment>',
+        '}'
+      ].join('\n')
     });
     atmoMesh = new THREE.Mesh(new THREE.SphereGeometry(R * 1.24, 64, 40), atmoMat);
     atmoMesh.renderOrder = 3;
@@ -370,12 +383,14 @@
         '  rivers *= 0.6 + 0.4*sin(q.y*16.0 - uTime*0.9);',            // 河流流光
         '  vec3 col = mix(uOcean, uLand, land);',
         '  col = mix(col, uLandEdge, edge*0.85);',
-        '  col += uRiver * rivers * (0.65 + uPulse*1.6);',
-        '  float shade = 0.34 + 0.66*max(dot(n, normalize(vec3(0.35, 0.75, 0.56))), 0.0);',
+        '  col += uRiver * rivers * (1.5 + uPulse*2.2);',
+        '  float shade = 0.30 + 0.70*max(dot(n, normalize(vec3(0.35, 0.75, 0.56))), 0.0);',
         '  col *= shade;',
         '  float fres = pow(1.0 - abs(dot(n, normalize(vV))), 2.3);',
         '  col += uRim * (fres*0.35 + uPulse*0.45);',
         '  gl_FragColor = vec4(col, 1.0);',
+        '  #include <tonemapping_fragment>',
+        '  #include <encodings_fragment>',
         '}'
       ].join('\n')
     });
@@ -448,6 +463,8 @@
         '  float fres = pow(1.0 - abs(dot(normalize(vN), normalize(vV))), 2.0);',
         '  float a = c*0.07 + fres*0.04;',
         '  gl_FragColor = vec4(uCloud, a);',
+        '  #include <tonemapping_fragment>',
+        '  #include <encodings_fragment>',
         '}'
       ].join('\n')
     });
@@ -475,6 +492,8 @@
         '  float clump = 0.6 + 0.4*sin(ang*7.0 + uTime*0.05)*sin(ang*3.0 - uTime*0.03);',
         '  a *= 0.55 + 0.45*clump;',
         '  gl_FragColor = vec4(uColor, a*0.5);',
+        '  #include <tonemapping_fragment>',
+        '  #include <encodings_fragment>',
         '}'
       ].join('\n')
     });
@@ -597,7 +616,7 @@
 
       // 光晕
       var glow = new THREE.Sprite(new THREE.SpriteMaterial({
-        map: glowTex, color: cur.label, transparent: true, opacity: 0.55,
+        map: glowTex, color: cur.label, transparent: true, opacity: 0.45,
         blending: THREE.AdditiveBlending, depthWrite: false
       }));
       glow.position.copy(pos);
@@ -1148,7 +1167,8 @@
       a.ring.rotation.z += dt * 0.4;
       var ls = isActive ? 1.12 : 1;
       a.label.scale.set(4.6 * ls, 1.15 * ls, 1);
-      a.orb.material.color.copy(cur.label);
+      a.orb.material.color.copy(cur.label).multiplyScalar(2.0);
+      a.glow.material.color.copy(cur.label).multiplyScalar(1.6);
     });
 
     /* 配色过渡 */
@@ -1156,7 +1176,10 @@
     COLOR_KEYS.forEach(function (k) { cur[k].lerp(tgt[k], lk); });
     NUM_KEYS.forEach(function (k) { cur[k] += (tgt[k] - cur[k]) * lk; });
     gridMat.opacity = cur.gridOp * (0.85 + 0.15 * Math.sin(t * 1.3));
+    gridMat.color.copy(cur.grid).multiplyScalar(1.8);
     equatorMat.opacity = cur.gridOp * 1.1;
+    equatorMat.color.copy(cur.river).multiplyScalar(1.8);
+    ringMat.uniforms.uColor.value.copy(cur.rim).multiplyScalar(1.5);
     starsMat.opacity = cur.starsOp;
     haloMat.opacity = cur.haloOp;
     pillarMat.opacity = cur.pillarOp;
