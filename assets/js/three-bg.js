@@ -141,26 +141,26 @@
   /* ---------- 配色（日/夜 × 分区） ---------- */
   var PALETTES = {
     day: {
-      base: { skyTop: '#ffeaf4', skyBottom: '#ffaacd', nebula: '#ffd3e5', halo: '#ffe0ee',
-        ocean: '#ffc9e1', land: '#ff79b4', landEdge: '#ffb1d0', river: '#ffffff',
-        grid: '#ff9cc6', cloud: '#ffffff', rim: '#fff3f8', label: '#ff8fbd',
-        exposure: 1.1, bloom: 0.5, threshold: 0.75, gridOp: 0.34, starsOp: 0.6, nebOp: 0.42, haloOp: 0.42, pillarOp: 0.2 },
+      base: { skyTop: '#ffe3ef', skyBottom: '#ff9cc4', nebula: '#ffcfe2', halo: '#ffd9ea',
+        ocean: '#f6a9cc', land: '#f25a9f', landEdge: '#ffa9ca', river: '#fff4f9',
+        grid: '#ff7bac', cloud: '#ffffff', rim: '#fff0f6', label: '#ff6fa8',
+        exposure: 0.98, bloom: 0.35, threshold: 0.8, gridOp: 0.4, starsOp: 0.55, nebOp: 0.38, haloOp: 0.32, pillarOp: 0.18 },
       about:   {},
-      featured: { grid: '#ff7bac', land: '#ff8cc2' },
-      xhs:     { grid: '#ff5c8d', skyBottom: '#ff9cc2', land: '#ff72a8' },
-      bili:    { grid: '#ffa3c6', skyTop: '#ffedf6' },
-      follow:  { grid: '#ffb1cf', skyTop: '#fff2f9' }
+      featured: { grid: '#ff5c8d', land: '#f76aa8' },
+      xhs:     { grid: '#ff4f93', skyBottom: '#ff93bd', land: '#ef4f92' },
+      bili:    { grid: '#ff8fbd', skyTop: '#ffe9f2' },
+      follow:  { grid: '#ff9cc6', skyTop: '#fff0f7' }
     },
     night: {
-      base: { skyTop: '#200717', skyBottom: '#7c1f50', nebula: '#7a1f4e', halo: '#ff6fa8',
-        ocean: '#4c0f31', land: '#ff4f93', landEdge: '#a81d55', river: '#ffd7e6',
-        grid: '#ff7bac', cloud: '#ffb9d5', rim: '#ff9cc6', label: '#ff9cc6',
-        exposure: 1.3, bloom: 0.85, threshold: 0.6, gridOp: 0.6, starsOp: 0.9, nebOp: 0.8, haloOp: 0.8, pillarOp: 0.38 },
+      base: { skyTop: '#200717', skyBottom: '#701b48', nebula: '#6d153f', halo: '#ff5c9e',
+        ocean: '#4a0e30', land: '#ff4f93', landEdge: '#9c1a50', river: '#ffc4dc',
+        grid: '#ff6fa8', cloud: '#ff9ec6', rim: '#ff8fbd', label: '#ff8fbd',
+        exposure: 1.15, bloom: 0.62, threshold: 0.62, gridOp: 0.55, starsOp: 0.85, nebOp: 0.7, haloOp: 0.65, pillarOp: 0.34 },
       about:   {},
-      featured: { grid: '#ff8fbd' },
-      xhs:     { grid: '#ff5c8d', skyBottom: '#8a2157' },
-      bili:    { grid: '#ff9cc6', skyTop: '#24081a' },
-      follow:  { grid: '#ffb1cf', skyTop: '#26091b' }
+      featured: { grid: '#ff7bac' },
+      xhs:     { grid: '#ff4f93', skyBottom: '#7e1e50' },
+      bili:    { grid: '#ff8fbd', skyTop: '#24081a' },
+      follow:  { grid: '#ff9cc6', skyTop: '#26091b' }
     }
   };
   var COLOR_KEYS = ['skyTop', 'skyBottom', 'nebula', 'halo', 'ocean', 'land', 'landEdge', 'river', 'grid', 'cloud', 'rim', 'label'];
@@ -249,7 +249,7 @@
         '  float w1 = 0.55+0.45*sin(vPos.x*0.045 + uTime*0.16 + sin(vPos.z*0.05+uTime*0.07)*1.6);',
         '  float w2 = 0.55+0.45*sin(-vPos.x*0.06 + uTime*0.11 + vPos.z*0.02);',
         '  float w3 = 0.5+0.5*sin(vPos.z*0.05 - uTime*0.09);',
-        '  col += uAurora * (b1*w1*1.35 + b2*w2*1.1 + b3*w3*0.7);',
+        '  col += uAurora * (b1*w1*1.12 + b2*w2*0.95 + b3*w3*0.6);',
         '  col += uAurora * 0.22 * (0.5+0.5*sin(vPos.y*0.09 - uTime*0.05));',
         '  gl_FragColor = vec4(col, 1.0);',
         '}'
@@ -314,7 +314,7 @@
       side: THREE.BackSide, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
       uniforms: { uRim: { value: cur.rim } },
       vertexShader: 'varying vec3 vN; varying vec3 vV; void main(){ vN=normalize(normalMatrix*normal); vec4 mv=modelViewMatrix*vec4(position,1.0); vV=normalize(-mv.xyz); gl_Position=projectionMatrix*mv; }',
-      fragmentShader: 'varying vec3 vN; varying vec3 vV; uniform vec3 uRim; void main(){ float f=pow(clamp(0.72-abs(dot(normalize(vN),normalize(vV))),0.0,1.0),2.4); gl_FragColor=vec4(uRim, f*1.25); }'
+      fragmentShader: 'varying vec3 vN; varying vec3 vV; uniform vec3 uRim; void main(){ float f=pow(clamp(0.72-abs(dot(normalize(vN),normalize(vV))),0.0,1.0),2.4); gl_FragColor=vec4(uRim, f*0.85); }'
     });
     atmoMesh = new THREE.Mesh(new THREE.SphereGeometry(R * 1.24, 64, 40), atmoMat);
     atmoMesh.renderOrder = 3;
@@ -370,11 +370,11 @@
         '  rivers *= 0.6 + 0.4*sin(q.y*16.0 - uTime*0.9);',            // 河流流光
         '  vec3 col = mix(uOcean, uLand, land);',
         '  col = mix(col, uLandEdge, edge*0.85);',
-        '  col += uRiver * rivers * (1.55 + uPulse*2.4);',
-        '  float shade = 0.5 + 0.5*max(dot(n, normalize(vec3(0.35, 0.75, 0.56))), 0.0);',
+        '  col += uRiver * rivers * (1.15 + uPulse*2.2);',
+        '  float shade = 0.40 + 0.60*max(dot(n, normalize(vec3(0.35, 0.75, 0.56))), 0.0);',
         '  col *= shade;',
         '  float fres = pow(1.0 - abs(dot(n, normalize(vV))), 2.3);',
-        '  col += uRim * (fres*0.9 + uPulse*0.55);',
+        '  col += uRim * (fres*0.72 + uPulse*0.5);',
         '  gl_FragColor = vec4(col, 1.0);',
         '}'
       ].join('\n')
@@ -446,7 +446,7 @@
         '  float c = fbm(q*3.0 + vec3(0.0, uTime*0.02, 0.0));',
         '  c = smoothstep(0.5, 0.78, c);',
         '  float fres = pow(1.0 - abs(dot(normalize(vN), normalize(vV))), 2.0);',
-        '  float a = c*0.42 + fres*0.22;',
+        '  float a = c*0.30 + fres*0.14;',
         '  gl_FragColor = vec4(uCloud, a);',
         '}'
       ].join('\n')
@@ -804,19 +804,28 @@
   }
 
   /* ---------- 弧线飞行 / 吸附 ---------- */
+  /* 展示飞行三段：绕行俯冲（放大）→ 定格展示 → 回拉到常规距离；吸附飞行仅绕行 */
+  var SHOW_K = 0.78;
+
   function flyTo(view, isSnap) {
     var v = VIEWS[view];
     var dTheta = wrapPI(v.theta - cam.theta);
-    var dur = REDUCED ? 0.01 : (isSnap
+    var toR = clamp(radiusTarget, MIN_R, MAX_R);
+    var swingDur = REDUCED ? 0.01 : (isSnap
       ? Math.min(1.5, 0.75 + Math.abs(dTheta) * 0.55)
-      : Math.min(2.0, 1.05 + Math.abs(dTheta) * 0.5));
+      : Math.min(2.0, 0.95 + Math.abs(dTheta) * 0.42));
+    var holdDur = (!isSnap && !REDUCED) ? 0.65 : 0;
+    var returnDur = (!isSnap && !REDUCED) ? 0.55 : 0;
     fly = {
-      t: 0, dur: dur,
+      t: 0, dur: swingDur + holdDur + returnDur,
+      swingDur: swingDur, holdDur: holdDur, returnDur: returnDur,
       fromTheta: cam.theta, dTheta: dTheta,
       fromPhi: cam.phi, dPhi: v.phi - cam.phi,
-      fromR: cam.radius,
+      fromR: cam.radius, toR: toR,
+      showR: isSnap ? cam.radius : Math.max(MIN_R, toR * SHOW_K),
       view: view, snap: !!isSnap,
-      dirSign: dTheta >= 0 ? 1 : -1
+      dirSign: dTheta >= 0 ? 1 : -1,
+      sparkled: false
     };
     orbit.vTheta = 0;
     orbit.vPhi = 0;
@@ -826,6 +835,23 @@
     setSectionTarget(view);
     if (!isSnap && !REDUCED) startWarp();
     dispatch('xwb:view', { view: view });
+  }
+
+  /* 在节点处绽放一小簇星尘（定格展示时刻） */
+  function sparkleAt(pos, dir, n) {
+    for (var i = 0; i < n; i++) {
+      var idx = trailState.head;
+      trailState.head = (trailState.head + 1) % Q.trailN;
+      var az = Math.random() * Math.PI * 2, el = (Math.random() - 0.5) * Math.PI;
+      var sp = 0.9 + Math.random() * 1.6;
+      trailState.pos[idx * 3] = pos.x;
+      trailState.pos[idx * 3 + 1] = pos.y;
+      trailState.pos[idx * 3 + 2] = pos.z;
+      trailState.vel[idx * 3] = dir.x * 0.5 + Math.cos(az) * Math.cos(el) * sp;
+      trailState.vel[idx * 3 + 1] = dir.y * 0.5 + Math.sin(el) * sp;
+      trailState.vel[idx * 3 + 2] = dir.z * 0.5 + Math.sin(az) * Math.cos(el) * sp;
+      trailState.life[idx] = 0.6 + Math.random() * 0.5;
+    }
   }
 
   /* ---------- 输入 ---------- */
@@ -935,9 +961,9 @@
     var fwd = tmpB.copy(tmpA).normalize().negate();
     var bank = 0, sway = 0;
     if (fly) {
-      var k = Math.min(1, fly.t / fly.dur);
-      var s = Math.sin(Math.PI * k);
-      bank = fly.dirSign * 0.11 * s;           // 飞行时向星球倾斜（侧倾）
+      var swingK = fly.snap ? Math.min(1, fly.t / fly.dur) : Math.min(1, fly.t / fly.swingDur);
+      var s = Math.sin(Math.PI * swingK);
+      bank = fly.dirSign * 0.11 * s;           // 绕行时向星球倾斜（侧倾）
       sway = 1.1 * s;
     }
     upVec.set(0, 1, 0);
@@ -1003,19 +1029,37 @@
       planetGroup.scale.setScalar(0.5);
     }
 
-    /* 球面轨道：飞行 / 惯性 / 吸附 */
+    /* 球面轨道：飞行（绕行俯冲→定格展示→回拉）/ 惯性 / 吸附 */
     if (fly) {
       fly.t += rawDt;
-      var fk = Math.min(1, fly.t / fly.dur);
-      var fe = easeInOutCubic(fk);
-      cam.theta = fly.fromTheta + fly.dTheta * fe;
-      cam.phi = fly.fromPhi + fly.dPhi * fe;
-      cam.radius = fly.fromR * (1 - 0.05 * Math.sin(Math.PI * Math.min(1, fk)));   // 飞行中段略向星球俯冲
+      var swingK = fly.snap ? Math.min(1, fly.t / fly.dur) : Math.min(1, fly.t / fly.swingDur);
+      var se = easeInOutCubic(swingK);
+      var inHold = !fly.snap && fly.t >= fly.swingDur && fly.t < fly.swingDur + fly.holdDur;
+      var inReturn = !fly.snap && fly.t >= fly.swingDur + fly.holdDur;
+      cam.theta = fly.fromTheta + fly.dTheta * se;
+      cam.phi = fly.fromPhi + fly.dPhi * se;
+      if (fly.snap) {
+        cam.radius = fly.fromR * (1 - 0.05 * Math.sin(Math.PI * Math.min(1, fly.t / fly.dur)));
+      } else if (inReturn) {
+        var re = easeInOutCubic(Math.min(1, (fly.t - fly.swingDur - fly.holdDur) / fly.returnDur));
+        cam.radius = fly.showR + (fly.toR - fly.showR) * re;       // 回拉到常规距离
+      } else if (inHold) {
+        cam.radius = fly.showR;                                    // 定格展示特写
+      } else {
+        cam.radius = fly.fromR + (fly.showR - fly.fromR) * se;     // 沿轨道绕行 + 俯冲放大
+      }
+      if (inHold && !fly.sparkled) {
+        fly.sparkled = true;
+        surfacePulse = Math.max(surfacePulse, 0.55);               // 展示瞬间地表能量亮起
+        var na = anchors[fly.view];
+        if (na) sparkleAt(na.pos, na.dir, 18);
+      }
       var camVel = tmpA.copy(camera.position).sub(prevCamPos).multiplyScalar(30);
-      spawnTrail(fly.snap ? 1 : 3, camera.position, camVel);
-      if (fk >= 1) {
+      spawnTrail(fly.snap ? 1 : (inHold ? 0 : (inReturn ? 2 : 3)), camera.position, camVel);
+      if (fly.t >= fly.dur) {
         cam.theta = wrapPI(fly.fromTheta + fly.dTheta);
         cam.phi = fly.fromPhi + fly.dPhi;
+        cam.radius = fly.snap ? cam.radius : fly.toR;
         fly = null;
         orbit.vTheta = 0;
         orbit.vPhi = 0;
@@ -1041,9 +1085,14 @@
       cam.radius += (radiusTarget - cam.radius) * Math.min(1, dt * 4.5);   // 滚轮平滑缩放
     }
 
-    /* FOV：飞行收缩 / 脉冲扩张 */
+    /* FOV：绕行俯冲收缩 / 定格展示轻微推镜 / 脉冲扩张 */
     var desired = baseFov;
-    if (fly) desired -= 4.5 * Math.sin(Math.PI * Math.min(1, fly.t / fly.dur));
+    if (fly) {
+      var swingK2 = fly.snap ? Math.min(1, fly.t / fly.dur) : Math.min(1, fly.t / fly.swingDur);
+      var holdNow = !fly.snap && fly.t >= fly.swingDur && fly.t < fly.swingDur + fly.holdDur;
+      if (holdNow) desired += 2.5;
+      else desired -= 4.5 * Math.sin(Math.PI * swingK2);
+    }
     if (intro === 'charge') desired -= 3 * Math.sin(Math.PI * Math.min(1, introT / 1.7));
     desired += pulseKick * 3;
     cam.fov += (desired - cam.fov) * Math.min(1, dt * 8);
