@@ -6,14 +6,13 @@
   <meta name="theme-color" content="#ff7bac">
   <link rel="icon" type="image/png" href="favicon.png">
   <link rel="shortcut icon" type="image/png" href="favicon.ico">
-  <meta name="description" content="小白超白的空间 — 小白超白的的个人作品集：先认识小白，再看娃娃开箱、好物测评、GBC 和 chiikawa。">
+  <meta name="description" content="小白超白的空间 — 小白超白的的个人作品集 3D 星球展厅。">
   <title>小白超白的空间 · Xiaobai's Space</title>
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-    <script src="assets/js/icons.js"></script>
-    <div class="scroll-progress" aria-hidden="true"><i id="scroll-progress-bar"></i></div>
-  <!-- 背景氛围：3D 大爆炸星云画布 + CSS 兜底氛围 -->
+  <script src="assets/js/icons.js"></script>
+
   <div class="bg-scene" aria-hidden="true">
     <div class="webgl-stage" id="webgl-stage-wrap">
       <canvas id="webgl-stage"></canvas>
@@ -26,9 +25,8 @@
     <div class="intro-flash" id="intro-flash"></div>
   </div>
 
-  <!-- 顶部导航 -->
   <header class="topbar" id="topbar">
-    <a class="brand" href="#about">
+    <a class="brand" href="#" data-view="about">
       <span class="brand-badge"><svg class="icon" aria-hidden="true"><use href="#i-heart"></use></svg></span>
       <span class="brand-text">
         <b>小白超白的空间</b>
@@ -36,119 +34,26 @@
       </span>
     </a>
 
-    <nav class="nav-links" aria-label="主导航">
-      <a href="#about" class="active">关于小白</a>
-      <a href="#featured">精选</a>
-      <a href="#xhs">小红书</a>
-      <a href="#bili">B站</a>
-      <a href="#follow">关注</a>
+    <nav class="nav-links" aria-label="星球导航">
+      <a href="#" data-view="about" class="active">关于小白</a>
+      <a href="#" data-view="featured">精选</a>
+      <a href="#" data-view="xhs">小红书</a>
+      <a href="#" data-view="bili">B站</a>
+      <a href="#" data-view="follow">关注</a>
     </nav>
 
     <div class="top-actions">
-      <button class="icon-btn" id="search-btn" title="搜索作品" aria-label="搜索作品"><svg class="icon" aria-hidden="true"><use href="#i-search"></use></svg></button>
+      <button class="icon-btn" id="search-btn" title="搜索作品（ / ）" aria-label="搜索作品"><svg class="icon" aria-hidden="true"><use href="#i-search"></use></svg></button>
       <button class="icon-btn" id="theme-btn" title="切换日夜氛围" aria-label="切换日夜氛围"><svg class="icon" aria-hidden="true"><use href="#i-moon"></use></svg></button>
       <button class="icon-btn" id="music-btn" title="播放背景音乐（默认关闭）" aria-label="播放背景音乐"><svg class="icon" aria-hidden="true"><use href="#i-music"></use></svg></button>
-      <button class="icon-btn pulse-btn" id="pulse-btn" title="脉冲跃迁（快捷键 B）" aria-label="脉冲跃迁"><svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg></button>
+      <button class="icon-btn pulse-btn" id="pulse-btn" title="脉冲跃迁（ B ）" aria-label="脉冲跃迁"><svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg></button>
     </div>
   </header>
 
-  <main>
-    <!-- 第一屏：先介绍小白 -->
-    <section class="hero section" id="about">
-      <div class="hero-shell">
-        <div class="hero-copy">
-          <p class="eyebrow reveal"><svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg> 你好呀，这里是</p>
-          <h1 class="hero-name reveal" style="--d:.06s">小白超白的</h1>
-          <p class="hero-sub reveal" style="--d:.12s">XIAOBAI'S SPACE · 小白超白的空间</p>
-          <p class="hero-bio reveal" style="--d:.18s">
-            小白的二次元日常～ 喜欢粉色的小可爱们！！！
-          </p>
-
-          <div class="hero-stats reveal" style="--d:.24s" id="hero-stats"></div>
-
-          <div class="hero-actions reveal" style="--d:.3s">
-            <a class="btn btn-primary" id="hero-bili" href="#" target="_blank" rel="noopener noreferrer"><svg class="icon" aria-hidden="true"><use href="#i-tv"></use></svg> 去B站看小白</a>
-            <a class="btn btn-ghost" id="hero-xhs" href="#" target="_blank" rel="noopener noreferrer"><svg class="icon" aria-hidden="true"><use href="#i-book-heart"></use></svg> 小红书主页</a>
-          </div>
-            <div class="hero-hints reveal" style="--d:.34s">
-              <span><kbd>B</kbd> 脉冲跃迁</span>
-              <span><kbd>/</kbd> 搜索作品</span>
-              <span><svg class="icon" aria-hidden="true"><use href="#i-mouse-pointer-2"></use></svg> 移动鼠标看视差</span>
-            </div>
-          <p class="hero-sign reveal" style="--d:.36s" id="hero-sign">加油加油～</p>
-        </div>
-
-        <div class="hero-stage reveal" style="--d:.15s">
-          <div class="orbit orbit-a"></div>
-          <div class="orbit orbit-b"></div>
-          <div class="orbit orbit-c"></div>
-          <span class="orbit-emoji oe-1"><svg class="icon" aria-hidden="true"><use href="#i-package"></use></svg></span>
-          <span class="orbit-emoji oe-2"><svg class="icon" aria-hidden="true"><use href="#i-heart"></use></svg></span>
-          <span class="orbit-emoji oe-3"><svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg></span>
-          <span class="orbit-emoji oe-4"><svg class="icon" aria-hidden="true"><use href="#i-rabbit"></use></svg></span>
-          <div class="avatar-medallion">
-            <img id="hero-avatar" alt="小白超白的头像">
-          </div>
-          <span class="hero-sticker s1"><svg class="icon" aria-hidden="true"><use href="#i-star"></use></svg></span>
-          <span class="hero-sticker s2"><svg class="icon" aria-hidden="true"><use href="#i-heart"></use></svg></span>
-          <span class="hero-sticker s3"><svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg></span>
-        </div>
-      </div>
-
-      <a class="scroll-cue" href="#featured">
-        <span>先认识小白，再看看作品</span>
-        <i></i>
-      </a>
-    </section>
-
-    <!-- 精选焦点 -->
-    <section class="section showcase" id="featured">
-      <div class="section-head reveal">
-        <span class="section-kicker">FEATURED</span>
-        <h2><svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg> 精选焦点</h2>
-        <p>先看几件小白最受欢迎的小作品</p>
-      </div>
-      <div class="featured-scroller" id="featured-scroller"></div>
-    </section>
-
-    <!-- 小红书岛 -->
-    <section class="section island xhs-section" id="xhs">
-      <div class="section-head reveal">
-        <span class="section-kicker">XIAOHONGSHU ISLAND</span>
-        <h2><svg class="icon" aria-hidden="true"><use href="#i-book-heart"></use></svg> 小红书岛</h2>
-        <p>32 件真实作品 · 开箱 / 测评 / GBC / chiikawa</p>
-      </div>
-      <div class="filters reveal" id="xhs-filters"></div>
-      <div class="masonry" id="xhs-grid"></div>
-    </section>
-
-    <!-- B站视频墙 -->
-    <section class="section island bili-section" id="bili">
-      <div class="section-head reveal">
-        <span class="section-kicker">BILIBILI VIDEO WALL</span>
-        <h2><svg class="icon" aria-hidden="true"><use href="#i-clapperboard"></use></svg> B站视频墙</h2>
-        <p>42 支视频 · 播放 / 弹幕 / 日期全部真实</p>
-      </div>
-      <div class="filters reveal" id="bili-filters"></div>
-      <div class="bili-grid" id="bili-grid"></div>
-    </section>
-
-    <!-- 关注小白 -->
-    <section class="section follow-section" id="follow">
-      <div class="section-head reveal">
-        <span class="section-kicker">FOLLOW XIAOBAI</span>
-        <h2><svg class="icon" aria-hidden="true"><use href="#i-heart"></use></svg> 关注小白</h2>
-        <p>日常、开箱、GBC、chiikawa…都在这里更新</p>
-      </div>
-      <div class="follow-cards" id="follow-cards"></div>
-      <footer class="footer">
-        <p><svg class="icon" aria-hidden="true"><use href="#i-heart"></use></svg> 小白超白的空间 · 加油加油～</p>
-        <p>所有作品数据与封面来自小白超白的公开主页，仅作个人作品集展示。</p>
-      </footer>
-    </section>
+  <main class="world-main">
+    <div class="view-panel" id="view-panel"></div>
   </main>
 
-  <!-- 搜索面板 -->
   <div class="search-panel" id="search-panel" aria-hidden="true">
     <div class="search-card">
       <div class="search-head">
@@ -169,7 +74,6 @@
     </div>
   </div>
 
-  <!-- 详情弹层 -->
   <div class="modal" id="detail-modal" aria-hidden="true">
     <div class="modal-backdrop" data-close-detail></div>
     <article class="detail-card" role="dialog" aria-modal="true" aria-labelledby="detail-title">
@@ -189,11 +93,10 @@
   </div>
 
   <canvas class="fx-canvas" id="fx-canvas" aria-hidden="true"></canvas>
-  <button class="back-top" id="back-top" aria-label="回到顶部"><svg class="icon" aria-hidden="true"><use href="#i-arrow-up"></use></svg></button>
 
   <script src="assets/js/data.js"></script>
-  <!-- 3D 大爆炸背景：Three.js + 后处理全部本地打包 -->
   <script src="assets/lib/three.min.js"></script>
+  <script src="assets/lib/OrbitControls.js"></script>
   <script src="assets/lib/postprocessing/CopyShader.js"></script>
   <script src="assets/lib/postprocessing/EffectComposer.js"></script>
   <script src="assets/lib/postprocessing/ShaderPass.js"></script>
