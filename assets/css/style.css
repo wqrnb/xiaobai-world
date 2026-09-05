@@ -105,6 +105,49 @@ img {
   pointer-events: none;
 }
 
+.webgl-stage {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+
+.webgl-stage canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.xwb-no3d .webgl-stage {
+  display: none;
+}
+
+.aurora,
+.sparkles,
+.floaties {
+  z-index: 1;
+}
+
+.intro-flash {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.98) 0%, rgba(255, 196, 218, 0.92) 32%, rgba(255, 92, 141, 0.16) 68%, transparent 100%);
+}
+
+.intro-flash.boom {
+  animation: intro-flash-boom 0.9s var(--ease) forwards;
+}
+
+@keyframes intro-flash-boom {
+  0% { opacity: 0; transform: scale(0.65); }
+  14% { opacity: 1; transform: scale(1.12); }
+  100% { opacity: 0; transform: scale(1.5); }
+}
+
 .aurora {
   position: absolute;
   width: 52vw;
@@ -180,6 +223,15 @@ img {
 @keyframes floaty-rise {
   0%, 100% { transform: translate3d(0, 8px, 0) rotate(-4deg); }
   50% { transform: translate3d(0, -18px, 0) rotate(5deg); }
+}
+
+.xwb-intro .scroll-cue {
+  opacity: 0;
+  transition: opacity 0.5s var(--ease);
+}
+
+.xwb-boomed .scroll-cue {
+  opacity: 1;
 }
 
 /* ---------- 顶部导航 ---------- */

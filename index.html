@@ -11,13 +11,17 @@
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-  <!-- 背景氛围 -->
+  <!-- 背景氛围：3D 大爆炸星云画布 + CSS 兜底氛围 -->
   <div class="bg-scene" aria-hidden="true">
+    <div class="webgl-stage" id="webgl-stage-wrap">
+      <canvas id="webgl-stage"></canvas>
+    </div>
     <div class="aurora aurora-a"></div>
     <div class="aurora aurora-b"></div>
     <div class="aurora aurora-c"></div>
     <div class="sparkles" id="sparkles"></div>
     <div class="floaties" id="floaties"></div>
+    <div class="intro-flash" id="intro-flash"></div>
   </div>
 
   <!-- 顶部导航 -->
@@ -179,6 +183,16 @@
   <button class="back-top" id="back-top" aria-label="回到顶部">↑</button>
 
   <script src="assets/js/data.js"></script>
+  <!-- 3D 大爆炸背景：Three.js + 后处理全部本地打包 -->
+  <script src="assets/lib/three.min.js"></script>
+  <script src="assets/lib/postprocessing/CopyShader.js"></script>
+  <script src="assets/lib/postprocessing/EffectComposer.js"></script>
+  <script src="assets/lib/postprocessing/ShaderPass.js"></script>
+  <script src="assets/lib/postprocessing/LuminosityHighPassShader.js"></script>
+  <script src="assets/lib/postprocessing/UnrealBloomPass.js"></script>
+  <script src="assets/lib/postprocessing/RenderPass.js"></script>
+  <script src="assets/lib/postprocessing/MaskPass.js"></script>
+  <script src="assets/js/three-bg.js"></script>
   <script src="assets/js/app.js"></script>
 </body>
 </html>

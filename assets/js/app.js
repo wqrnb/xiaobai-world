@@ -333,8 +333,10 @@
    * ============================================================ */
   function toggleTheme() {
     var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    var next = isDark ? 'day' : 'night';
     document.documentElement.setAttribute('data-theme', isDark ? '' : 'dark');
     $('#theme-btn').textContent = isDark ? '🌙' : '☀️';
+    if (window.XBW_BG && window.XBW_BG.setTheme) window.XBW_BG.setTheme(next);
   }
 
   /* ============================================================
@@ -516,7 +518,26 @@
     buildBili();
     buildFollow();
     bindUI();
-    buildObservers();
+
+    var bg = window.XBW_BG;
+    if (bg && bg.supported) {
+      document.body.classList.add('xwb-intro');
+      var shown = false;
+      function revealContent() {
+        if (shown) return;
+        shown = true;
+        document.body.classList.remove('xwb-intro');
+        document.body.classList.add('xwb-boomed');
+        setTimeout(buildObservers, 80);
+      }
+      document.addEventListener('xwb:boom', revealContent, { once: true });
+      bg.start();
+      // 兜底：万一某些设备没触发爆炸事件，1.5 秒后仍显示内容
+      setTimeout(revealContent, 1500);
+    } else {
+      buildObservers();
+    }
+
     onScroll();
   }
 
