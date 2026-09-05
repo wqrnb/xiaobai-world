@@ -17,6 +17,12 @@
     <div class="webgl-stage" id="webgl-stage-wrap">
       <canvas id="webgl-stage"></canvas>
     </div>
+    <svg class="link-beam" id="link-beam" aria-hidden="true">
+      <line id="beam-line" class="beam-line" x1="0" y1="0" x2="0" y2="0"></line>
+      <line id="beam-dash" class="beam-dash" x1="0" y1="0" x2="0" y2="0"></line>
+      <circle id="beam-node-glow" class="beam-node-glow" cx="0" cy="0" r="9"></circle>
+      <circle id="beam-panel-dot" class="beam-panel-dot" cx="0" cy="0" r="4"></circle>
+    </svg>
     <div class="aurora aurora-a"></div>
     <div class="aurora aurora-b"></div>
     <div class="aurora aurora-c"></div>
@@ -93,6 +99,8 @@
   </div>
 
   <canvas class="fx-canvas" id="fx-canvas" aria-hidden="true"></canvas>
+
+  <div class="hint-bar" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-mouse-pointer-2"></use></svg> 拖拽旋转星球 · 滚轮缩放 · 松手自动吸附</div>
 
   <script src="assets/js/data.js"></script>
   <script src="assets/lib/three.min.js"></script>
