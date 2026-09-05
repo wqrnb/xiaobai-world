@@ -700,7 +700,6 @@
   function makeFrameTexture(item, kind) {
     var w = Q.frameScale < 1 ? (kind === 'bili' ? 420 : 384) : (kind === 'bili' ? 840 : 768);
     var h = kind === 'bili' ? Math.round(w * 9 / 16) : Math.round(w * 0.75);
-    if (kind === 'image') { w = 640; h = 720; }
     return loadImage(item.cover).then(function (img) {
       var c = document.createElement('canvas');
       c.width = w; c.height = h;
@@ -729,10 +728,10 @@
       ctx.fillStyle = kind === 'bili' ? 'rgba(255,126,173,0.92)' : 'rgba(244,81,151,0.92)';
       ctx.fill();
       ctx.fillStyle = '#fff';
-      ctx.fillText(kind === 'bili' ? '📺 B站视频' : (kind === 'image' ? '🎀 图文' : '📕 小红书'), bx + bw / 2, by + bh / 2 + 1);
+      ctx.fillText(kind === 'bili' ? '📺 B站视频' : '📕 小红书', bx + bw / 2, by + bh / 2 + 1);
 
       // 底部标题区
-      var title = item.title || (item.placeholder ? '图文作品整理中' : '小白作品');
+      var title = item.title || '小白作品';
       var ty = h - 44;
       ctx.fillStyle = '#5b2244';
       ctx.font = 'bold ' + Math.round(w * 0.052) + 'px "Microsoft YaHei UI", sans-serif';
@@ -756,7 +755,7 @@
       ctx.fillStyle = '#e84f92';
       ctx.font = 'bold ' + Math.round(w * 0.07) + 'px sans-serif';
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.fillText('💗 作品封面整理中', w / 2, h / 2);
+      ctx.fillText('💗 封面暂时走丢了', w / 2, h / 2);
       var tex = canvasTexture(c, { mipmaps: false, linear: true });
       tex.needsUpdate = true;
       return tex;
@@ -766,8 +765,8 @@
   var frameGeos = {};
   function getFrameGeo(kind) {
     if (frameGeos[kind]) return frameGeos[kind];
-    var w = kind === 'bili' ? 2.05 : (kind === 'image' ? 1.4 : 1.78);
-    var h = kind === 'bili' ? 1.16 : (kind === 'image' ? 1.56 : 1.34);
+    var w = kind === 'bili' ? 1.88 : 1.72;
+    var h = kind === 'bili' ? 1.06 : 1.29;
     frameGeos[kind] = new THREE.PlaneGeometry(w, h);
     return frameGeos[kind];
   }
@@ -825,35 +824,35 @@
   }
 
   function createXhsIsland() {
-    var center = new THREE.Vector3(-17, 0.6, 2);
-    var group = createIslandBase({ id: 'xhs', center: center, radius: 8.4 });
-    makeIslandSign(group, '📕 小红书岛 · 32件', 4.7, '#ff5c8d');
+    var center = new THREE.Vector3(-23, 0.6, 2);
+    var group = createIslandBase({ id: 'xhs', center: center, radius: 7.8 });
+    makeIslandSign(group, '📕 小红书岛 · 32件', 4.3, '#ff5c8d');
     var items = DATA.xhs.items;
     items.forEach(function (item, i) {
       var ring = i < 18 ? 0 : 1;
       var idx = ring === 0 ? i : i - 18;
       var count = ring === 0 ? 18 : 14;
-      var r = ring === 0 ? 7.1 : 5.2;
-      var y = ring === 0 ? 2.5 : 3.9;
+      var r = ring === 0 ? 6.6 : 4.9;
+      var y = ring === 0 ? 2.25 : 3.95;
       var a = (idx / count) * Math.PI * 2 + (ring * 0.3);
       var x = Math.sin(a) * r;
       var z = Math.cos(a) * r;
-      addFrameToIsland(group, item, 'xhs', new THREE.Vector3(x, y + (ring ? 0.15 : 0), z), Math.atan2(x, z));
+      addFrameToIsland(group, item, 'xhs', new THREE.Vector3(x, y, z), Math.atan2(x, z));
     });
     return group;
   }
 
   function createBiliIsland() {
-    var center = new THREE.Vector3(18, 0.8, -1);
-    var group = createIslandBase({ id: 'bili', center: center, radius: 10.2 });
-    makeIslandSign(group, '📺 B站视频墙 · 42支', 6.6, '#ff4f9a');
+    var center = new THREE.Vector3(24, 0.8, 1.5);
+    var group = createIslandBase({ id: 'bili', center: center, radius: 9.2 });
+    makeIslandSign(group, '📺 B站视频墙 · 42支', 7.1, '#ff4f9a');
     var items = DATA.bili.items;
     items.forEach(function (item, i) {
       var ring = Math.floor(i / 14);
       var idx = i % 14;
       var count = 14;
-      var r = 8.7 - ring * 1.5;
-      var y = 2.8 + ring * 1.85;
+      var r = 8.2 - ring * 1.6;
+      var y = 2.7 + ring * 1.7;
       var a = (idx / count) * Math.PI * 2 + ring * 0.18;
       var x = Math.sin(a) * r;
       var z = Math.cos(a) * r;
@@ -862,58 +861,10 @@
     return group;
   }
 
-  function createImageIsland() {
-    var center = new THREE.Vector3(15, 0.7, 12.5);
-    var group = createIslandBase({ id: 'images', center: center, radius: 7.4 });
-    makeIslandSign(group, '🎀 B站图文 · 整理中', 4.2, '#ff8fb7');
-    DATA.bili.imagePlaceholders.forEach(function (item, i) {
-      var ring = i < 10 ? 0 : 1;
-      var idx = ring === 0 ? i : i - 10;
-      var count = 10;
-      var r = ring === 0 ? 5.8 : 4.6;
-      var y = ring === 0 ? 2.4 : 3.5;
-      var a = (idx / count) * Math.PI * 2 + ring * 0.32;
-      var x = Math.sin(a) * r;
-      var z = Math.cos(a) * r;
-      var frame = addFrameToIsland(group, item, 'image', new THREE.Vector3(x, y, z), Math.atan2(x, z));
-      frame.userData.palette = item.palette;
-      // 图文占位直接使用专用画框，不请求网络图片
-      makeImagePlaceholderTexture(item, frame);
-    });
-    return group;
-  }
-
-  function makeImagePlaceholderTexture(item, frame) {
-    var c = document.createElement('canvas');
-    c.width = 480; c.height = 540;
-    var ctx = c.getContext('2d');
-    var g = ctx.createLinearGradient(0, 0, 0, 540);
-    g.addColorStop(0, item.palette[0]);
-    g.addColorStop(1, item.palette[1]);
-    ctx.fillStyle = g;
-    roundedRectPath(ctx, 16, 16, 448, 508, 28);
-    ctx.fill();
-    ctx.fillStyle = 'rgba(255,255,255,0.9)';
-    ctx.font = 'bold 52px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('🎀', 240, 205);
-    ctx.fillStyle = '#d84d8d';
-    ctx.font = 'bold 40px sans-serif';
-    ctx.fillText('图文作品整理中', 240, 288);
-    ctx.fillStyle = 'rgba(255,255,255,0.95)';
-    ctx.font = 'bold 25px sans-serif';
-    ctx.fillText('NO.' + String(item.index + 1).padStart(2, '0'), 240, 350);
-    var tex = canvasTexture(c, { linear: true, mipmaps: false });
-    frame.material.map = tex;
-    frame.material.needsUpdate = true;
-    frame.userData.loaded = true;
-  }
-
   function createFeaturedIsland() {
-    var center = new THREE.Vector3(0, 0.5, -15);
-    var group = createIslandBase({ id: 'featured', center: center, radius: 7.2 });
-    makeIslandSign(group, '✨ 精选焦点', 3.4, '#ff5c8d');
+    var center = new THREE.Vector3(0, 0.4, -20);
+    var group = createIslandBase({ id: 'featured', center: center, radius: 6.2 });
+    makeIslandSign(group, '✨ 精选焦点', 3.2, '#ff5c8d');
     var featured = [];
     var byLikes = DATA.xhs.items.slice().sort(function (a, b) { return parseFloat(b.likes) - parseFloat(a.likes); });
     var byPlay = DATA.bili.items.slice().sort(function (a, b) { return parseFloat(b.play) - parseFloat(a.play); });
@@ -921,10 +872,10 @@
     [DATA.xhs.items[0], DATA.bili.items[0]].forEach(function (it) { if (featured.indexOf(it) < 0) featured.push(it); });
     featured.slice(0, 6).forEach(function (item, i) {
       var count = 6;
-      var r = 5.7;
+      var r = 5.1;
       var a = (i / count) * Math.PI * 2;
       var kind = item.url.indexOf('bilibili') >= 0 ? 'bili' : 'xhs';
-      addFrameToIsland(group, item, kind, new THREE.Vector3(Math.sin(a) * r, 2.5 + (i % 2) * 0.22, Math.cos(a) * r), Math.atan2(Math.sin(a), Math.cos(a)));
+      addFrameToIsland(group, item, kind, new THREE.Vector3(Math.sin(a) * r, 2.5 + (i % 2) * 0.18, Math.cos(a) * r), Math.atan2(Math.sin(a), Math.cos(a)));
     });
     return group;
   }
@@ -1042,16 +993,16 @@
   }
 
   function addInfoArea() {
-    var aboutCenter = new THREE.Vector3(-12, 1.4, -8.5);
-    var followCenter = new THREE.Vector3(12, 1.4, -8.5);
-    var aboutBase = createIslandBase({ id: 'about', center: aboutCenter, radius: 4.2 });
-    var followBase = createIslandBase({ id: 'follow', center: followCenter, radius: 4.6 });
-    makeIslandSign(aboutBase, '🐰 关于小白', 3.2, '#ff7bac');
-    makeIslandSign(followBase, '💌 关注小白', 3.2, '#ff5c8d');
+    var aboutCenter = new THREE.Vector3(-16.5, 1.4, -14.5);
+    var followCenter = new THREE.Vector3(16.5, 1.4, -14.5);
+    var aboutBase = createIslandBase({ id: 'about', center: aboutCenter, radius: 3.4 });
+    var followBase = createIslandBase({ id: 'follow', center: followCenter, radius: 3.4 });
+    makeIslandSign(aboutBase, '🐰 关于小白', 2.8, '#ff7bac');
+    makeIslandSign(followBase, '💌 关注小白', 2.8, '#ff5c8d');
 
     var aboutMat = new THREE.MeshBasicMaterial({ map: getPlaceholderTexture('xhs'), transparent: false, toneMapped: false });
-    var aboutCard = new THREE.Mesh(new THREE.PlaneGeometry(5.6, 4), aboutMat);
-    aboutCard.position.set(0, 2.9, 0);
+    var aboutCard = new THREE.Mesh(new THREE.PlaneGeometry(5.2, 3.7), aboutMat);
+    aboutCard.position.set(0, 2.8, 0);
     aboutCard.userData = { link: DATA.meta.xhsUrl, aboutCard: true, islandId: 'about' };
     aboutBase.add(aboutCard);
     makeAboutCardTexture().then(function (tex) {
@@ -1060,8 +1011,8 @@
     }).catch(function () {});
 
     var biliMat = new THREE.MeshBasicMaterial({ map: getPlaceholderTexture('bili'), transparent: false, toneMapped: false });
-    var biliCard = new THREE.Mesh(new THREE.PlaneGeometry(4.8, 2.7), biliMat);
-    biliCard.position.set(-2.65, 3, 0);
+    var biliCard = new THREE.Mesh(new THREE.PlaneGeometry(4.4, 2.5), biliMat);
+    biliCard.position.set(-2.3, 2.8, 0);
     biliCard.rotation.y = -0.35;
     biliCard.userData = { link: DATA.meta.biliUrl, followCard: true, islandId: 'follow' };
     followBase.add(biliCard);
@@ -1071,8 +1022,8 @@
     }).catch(function () {});
 
     var xhsMat = new THREE.MeshBasicMaterial({ map: getPlaceholderTexture('xhs'), transparent: false, toneMapped: false });
-    var xhsCard = new THREE.Mesh(new THREE.PlaneGeometry(4.8, 2.7), xhsMat);
-    xhsCard.position.set(2.65, 3, 0);
+    var xhsCard = new THREE.Mesh(new THREE.PlaneGeometry(4.4, 2.5), xhsMat);
+    xhsCard.position.set(2.3, 2.8, 0);
     xhsCard.rotation.y = 0.35;
     xhsCard.userData = { link: DATA.meta.xhsUrl, followCard: true, islandId: 'follow' };
     followBase.add(xhsCard);
@@ -1142,11 +1093,10 @@
    * ============================================================ */
   var CAMERA_SLOTS = {
     home: { pos: new THREE.Vector3(0, 5.5, 23.5), target: new THREE.Vector3(0, 3, 0), label: '首页' },
-    works: { pos: new THREE.Vector3(-27, 9, 15), target: new THREE.Vector3(-16, 2.4, 2), label: '作品' },
-    videos: { pos: new THREE.Vector3(28, 11, 11), target: new THREE.Vector3(17, 3.5, -1), label: '视频墙' },
-    images: { pos: new THREE.Vector3(24, 9, 22), target: new THREE.Vector3(15, 2.6, 12.5), label: '图文' },
-    about: { pos: new THREE.Vector3(-19, 6, -2), target: new THREE.Vector3(-12, 2, -8.5), label: '关于小白' },
-    follow: { pos: new THREE.Vector3(19, 6, -2), target: new THREE.Vector3(12, 2, -8.5), label: '关注' }
+    works: { pos: new THREE.Vector3(-32, 9, 14), target: new THREE.Vector3(-23, 2.3, 2), label: '作品' },
+    videos: { pos: new THREE.Vector3(34, 11, 13), target: new THREE.Vector3(24, 3.2, 1.5), label: '视频墙' },
+    about: { pos: new THREE.Vector3(-24, 6, -7), target: new THREE.Vector3(-16.5, 2.2, -14.5), label: '关于小白' },
+    follow: { pos: new THREE.Vector3(24, 6, -7), target: new THREE.Vector3(16.5, 2.2, -14.5), label: '关注' }
   };
 
   function easeInOutCubic(t) {
@@ -1171,7 +1121,6 @@
     var slot = CAMERA_SLOTS[slotName] || CAMERA_SLOTS.home;
     if (slotName === 'works') bumpIslandToQueueFront('xhs');
     if (slotName === 'videos') bumpIslandToQueueFront('bili');
-    if (slotName === 'images') bumpIslandToQueueFront('images');
     flyToCustom(slot.pos, slot.target, 1.35, slotName);
     setActiveSlot(slotName);
   }
@@ -1222,7 +1171,7 @@
     var dir = new THREE.Vector3(0, 0, 1).applyQuaternion(frame.getWorldQuaternion(new THREE.Quaternion()));
     highlightRing.quaternion.copy(frame.getWorldQuaternion(new THREE.Quaternion()));
     highlightRing.position.addScaledVector(dir, 0.06);
-    var s = frame.userData.kind === 'bili' ? 2.35 : (frame.userData.kind === 'image' ? 1.65 : 2.05);
+    var s = frame.userData.kind === 'bili' ? 2.1 : 1.9;
     highlightRing.scale.set(s, s, 1);
     highlightRing.visible = true;
     highlightTimer = 1.5;
@@ -1233,7 +1182,7 @@
     if (!item) return;
     var frame = itemFrameMap[item.id];
     if (!frame) {
-      toast('这件作品正在整理中 💗');
+      toast('这件作品还没挂到展馆 💗');
       return;
     }
     bumpIslandToQueueFront(frame.userData.islandId);
@@ -1309,7 +1258,7 @@
     var cat = categoryOf(item);
     $('#detail-cover').src = item.cover || '';
     $('#detail-cover').alt = item.title || '作品封面';
-    $('#detail-type').textContent = kind === 'bili' ? 'B站视频' : (kind === 'image' ? 'B站图文' : '小红书');
+    $('#detail-type').textContent = kind === 'bili' ? 'B站视频' : '小红书';
     $('#detail-cat').textContent = cat.emoji + ' ' + item.category;
     $('#detail-title').textContent = item.title || '小白作品';
     var statsHtml = '';
@@ -1317,16 +1266,12 @@
       statsHtml = '<span class="detail-stat">▶ 播放 ' + escapeHtml(numberLabel(item.play)) + '</span>' +
         '<span class="detail-stat">💬 弹幕 ' + escapeHtml(numberLabel(item.danmu)) + '</span>' +
         (item.date ? '<span class="detail-stat">🗓️ ' + escapeHtml(item.date) + '</span>' : '');
-    } else if (kind === 'image') {
-      statsHtml = '<span class="detail-stat">🎀 图文作品整理中</span>';
     } else {
       statsHtml = '<span class="detail-stat">👍 点赞 ' + escapeHtml(numberLabel(item.likes)) + '</span>' +
         '<span class="detail-stat">📕 小红书 · ' + escapeHtml(DATA.stats.xhs.redId) + '</span>';
     }
     $('#detail-stats').innerHTML = statsHtml;
-    $('#detail-note').textContent = kind === 'image'
-      ? '这 20 个画框是B站图文作品的占位，数据与封面整理后会自动挂载到这里。'
-      : '数据来自小白超白的的真实公开主页。点击下方按钮可前往原作品。';
+    $('#detail-note').textContent = '数据来自小白超白的的真实公开主页。点击下方按钮可前往原作品。';
     var link = $('#detail-link');
     if (item.url) {
       link.href = item.url;
@@ -1335,7 +1280,7 @@
     } else {
       link.href = '#';
       link.classList.add('disabled');
-      link.textContent = '整理中，敬请期待 💗';
+      link.textContent = '暂未开放原链接 💗';
     }
     modal.classList.add('open');
     modal.setAttribute('aria-hidden', 'false');
@@ -1350,9 +1295,7 @@
   function showItemForFrame(frame) {
     var item = frame.userData.item;
     if (!item) return;
-    if (item.placeholder) {
-      openDetail(item, 'image');
-    } else if (frame.userData.kind === 'bili') {
+    if (frame.userData.kind === 'bili') {
       openDetail(item, 'bili');
     } else {
       openDetail(item, 'xhs');
@@ -1856,7 +1799,6 @@
 
     createXhsIsland();
     createBiliIsland();
-    createImageIsland();
     createFeaturedIsland();
     var infoCards = addInfoArea();
     buildTextureQueue();
