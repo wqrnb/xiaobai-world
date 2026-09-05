@@ -141,26 +141,26 @@
   /* ---------- 配色（日/夜 × 分区） ---------- */
   var PALETTES = {
     day: {
-      base: { skyTop: '#ffe3ef', skyBottom: '#ff9cc4', nebula: '#ffcfe2', halo: '#ffd9ea',
-        ocean: '#f6a9cc', land: '#f25a9f', landEdge: '#ffa9ca', river: '#fff4f9',
-        grid: '#ff7bac', cloud: '#ffffff', rim: '#fff0f6', label: '#ff6fa8',
-        exposure: 0.98, bloom: 0.35, threshold: 0.8, gridOp: 0.4, starsOp: 0.55, nebOp: 0.38, haloOp: 0.32, pillarOp: 0.18 },
+      base: { skyTop: '#f9c6de', skyBottom: '#e2609b', nebula: '#f5a9c9', halo: '#f5b3d1',
+        ocean: '#da7bab', land: '#e93e8e', landEdge: '#e87bab', river: '#ffe9f2',
+        grid: '#ff5c9b', cloud: '#ffd9e8', rim: '#ffe4f0', label: '#ff4f9b',
+        exposure: 0.72, bloom: 0.22, threshold: 0.85, gridOp: 0.36, starsOp: 0.45, nebOp: 0.26, haloOp: 0.16, pillarOp: 0.12 },
       about:   {},
-      featured: { grid: '#ff5c8d', land: '#f76aa8' },
-      xhs:     { grid: '#ff4f93', skyBottom: '#ff93bd', land: '#ef4f92' },
-      bili:    { grid: '#ff8fbd', skyTop: '#ffe9f2' },
-      follow:  { grid: '#ff9cc6', skyTop: '#fff0f7' }
+      featured: { grid: '#ff3f8e', land: '#ec3a8a' },
+      xhs:     { grid: '#ff2e85', skyBottom: '#d9548e', land: '#e52f84' },
+      bili:    { grid: '#ff6ba4', skyTop: '#f8c3db' },
+      follow:  { grid: '#ff82b4', skyTop: '#fbd0e2' }
     },
     night: {
-      base: { skyTop: '#200717', skyBottom: '#701b48', nebula: '#6d153f', halo: '#ff5c9e',
-        ocean: '#4a0e30', land: '#ff4f93', landEdge: '#9c1a50', river: '#ffc4dc',
-        grid: '#ff6fa8', cloud: '#ff9ec6', rim: '#ff8fbd', label: '#ff8fbd',
-        exposure: 1.15, bloom: 0.62, threshold: 0.62, gridOp: 0.55, starsOp: 0.85, nebOp: 0.7, haloOp: 0.65, pillarOp: 0.34 },
+      base: { skyTop: '#1c0614', skyBottom: '#64163f', nebula: '#5a1036', halo: '#f53f8b',
+        ocean: '#3f0c29', land: '#ed3d82', landEdge: '#7e1443', river: '#ffaed0',
+        grid: '#ff4f9b', cloud: '#ff7db4', rim: '#ff74ac', label: '#ff74ac',
+        exposure: 0.9, bloom: 0.5, threshold: 0.66, gridOp: 0.48, starsOp: 0.75, nebOp: 0.55, haloOp: 0.45, pillarOp: 0.26 },
       about:   {},
-      featured: { grid: '#ff7bac' },
-      xhs:     { grid: '#ff4f93', skyBottom: '#7e1e50' },
-      bili:    { grid: '#ff8fbd', skyTop: '#24081a' },
-      follow:  { grid: '#ff9cc6', skyTop: '#26091b' }
+      featured: { grid: '#ff5fa6' },
+      xhs:     { grid: '#ff2e85', skyBottom: '#701843' },
+      bili:    { grid: '#ff74ac', skyTop: '#200815' },
+      follow:  { grid: '#ff82b4', skyTop: '#220a16' }
     }
   };
   var COLOR_KEYS = ['skyTop', 'skyBottom', 'nebula', 'halo', 'ocean', 'land', 'landEdge', 'river', 'grid', 'cloud', 'rim', 'label'];
@@ -249,8 +249,8 @@
         '  float w1 = 0.55+0.45*sin(vPos.x*0.045 + uTime*0.16 + sin(vPos.z*0.05+uTime*0.07)*1.6);',
         '  float w2 = 0.55+0.45*sin(-vPos.x*0.06 + uTime*0.11 + vPos.z*0.02);',
         '  float w3 = 0.5+0.5*sin(vPos.z*0.05 - uTime*0.09);',
-        '  col += uAurora * (b1*w1*1.12 + b2*w2*0.95 + b3*w3*0.6);',
-        '  col += uAurora * 0.22 * (0.5+0.5*sin(vPos.y*0.09 - uTime*0.05));',
+        '  col += uAurora * (b1*w1*0.7 + b2*w2*0.6 + b3*w3*0.35);',
+        '  col += uAurora * 0.15 * (0.5+0.5*sin(vPos.y*0.09 - uTime*0.05));',
         '  gl_FragColor = vec4(col, 1.0);',
         '}'
       ].join('\n')
@@ -314,7 +314,7 @@
       side: THREE.BackSide, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
       uniforms: { uRim: { value: cur.rim } },
       vertexShader: 'varying vec3 vN; varying vec3 vV; void main(){ vN=normalize(normalMatrix*normal); vec4 mv=modelViewMatrix*vec4(position,1.0); vV=normalize(-mv.xyz); gl_Position=projectionMatrix*mv; }',
-      fragmentShader: 'varying vec3 vN; varying vec3 vV; uniform vec3 uRim; void main(){ float f=pow(clamp(0.72-abs(dot(normalize(vN),normalize(vV))),0.0,1.0),2.4); gl_FragColor=vec4(uRim, f*0.85); }'
+      fragmentShader: 'varying vec3 vN; varying vec3 vV; uniform vec3 uRim; void main(){ float f=pow(clamp(0.72-abs(dot(normalize(vN),normalize(vV))),0.0,1.0),2.4); gl_FragColor=vec4(uRim, f*0.6); }'
     });
     atmoMesh = new THREE.Mesh(new THREE.SphereGeometry(R * 1.24, 64, 40), atmoMat);
     atmoMesh.renderOrder = 3;
@@ -370,11 +370,11 @@
         '  rivers *= 0.6 + 0.4*sin(q.y*16.0 - uTime*0.9);',            // 河流流光
         '  vec3 col = mix(uOcean, uLand, land);',
         '  col = mix(col, uLandEdge, edge*0.85);',
-        '  col += uRiver * rivers * (1.15 + uPulse*2.2);',
-        '  float shade = 0.40 + 0.60*max(dot(n, normalize(vec3(0.35, 0.75, 0.56))), 0.0);',
+        '  col += uRiver * rivers * (0.65 + uPulse*1.6);',
+        '  float shade = 0.34 + 0.66*max(dot(n, normalize(vec3(0.35, 0.75, 0.56))), 0.0);',
         '  col *= shade;',
         '  float fres = pow(1.0 - abs(dot(n, normalize(vV))), 2.3);',
-        '  col += uRim * (fres*0.72 + uPulse*0.5);',
+        '  col += uRim * (fres*0.35 + uPulse*0.45);',
         '  gl_FragColor = vec4(col, 1.0);',
         '}'
       ].join('\n')
@@ -446,7 +446,7 @@
         '  float c = fbm(q*3.0 + vec3(0.0, uTime*0.02, 0.0));',
         '  c = smoothstep(0.5, 0.78, c);',
         '  float fres = pow(1.0 - abs(dot(normalize(vN), normalize(vV))), 2.0);',
-        '  float a = c*0.30 + fres*0.14;',
+        '  float a = c*0.07 + fres*0.04;',
         '  gl_FragColor = vec4(uCloud, a);',
         '}'
       ].join('\n')
@@ -543,22 +543,22 @@
     var c = document.createElement('canvas');
     c.width = 512; c.height = 128;
     var ctx = c.getContext('2d');
-    ctx.shadowColor = 'rgba(255,70,160,0.9)';
-    ctx.shadowBlur = 26;
-    ctx.fillStyle = 'rgba(255,255,255,0.95)';
+    ctx.shadowColor = 'rgba(255,60,150,0.75)';
+    ctx.shadowBlur = 18;
+    ctx.fillStyle = 'rgba(255,242,248,0.9)';
     roundRect(ctx, 20, 14, 472, 100, 50);
     ctx.fill();
     ctx.shadowBlur = 0;
-    ctx.strokeStyle = '#ff7bac';
+    ctx.strokeStyle = '#ff5c9b';
     ctx.lineWidth = 4;
     roundRect(ctx, 20, 14, 472, 100, 50);
     ctx.stroke();
-    ctx.fillStyle = '#d63f86';
+    ctx.fillStyle = '#c22f70';
     ctx.font = '700 44px "Microsoft YaHei UI", "PingFang SC", sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(title, 256, 58);
-    ctx.fillStyle = 'rgba(180,84,138,0.85)';
+    ctx.fillStyle = 'rgba(180,60,120,0.85)';
     ctx.font = '700 21px "Microsoft YaHei UI", sans-serif';
     ctx.fillText(sub, 256, 96);
     var tex = new THREE.CanvasTexture(c);
@@ -590,18 +590,18 @@
       // 发光节点
       var orb = new THREE.Mesh(
         new THREE.IcosahedronGeometry(0.4, 2),
-        new THREE.MeshBasicMaterial({ color: cur.label, transparent: true, opacity: 0.98 })
+        new THREE.MeshBasicMaterial({ color: cur.label, transparent: true, opacity: 0.9 })
       );
       orb.position.copy(pos);
       group.add(orb);
 
       // 光晕
       var glow = new THREE.Sprite(new THREE.SpriteMaterial({
-        map: glowTex, color: cur.label, transparent: true, opacity: 0.85,
+        map: glowTex, color: cur.label, transparent: true, opacity: 0.55,
         blending: THREE.AdditiveBlending, depthWrite: false
       }));
       glow.position.copy(pos);
-      glow.scale.set(2.2, 2.2, 1);
+      glow.scale.set(1.7, 1.7, 1);
       group.add(glow);
 
       // 文字标识
@@ -1142,7 +1142,8 @@
       a.scaleK += (target - a.scaleK) * Math.min(1, dt * 6);
       var pulse = 1 + 0.22 * Math.sin(t * 2.6 + a.phase);
       a.orb.scale.setScalar(pulse * a.scaleK);
-      a.glow.scale.set((2.0 + 0.4 * Math.sin(t * 2.2 + a.phase)) * a.scaleK, (2.0 + 0.4 * Math.sin(t * 2.2 + a.phase)) * a.scaleK, 1);
+      var gs = (1.7 + 0.3 * Math.sin(t * 2.2 + a.phase)) * a.scaleK;
+      a.glow.scale.set(gs, gs, 1);
       a.ring.scale.setScalar((1 + 0.3 * Math.sin(t * 1.8 + a.phase)) * (isActive || isNear ? 1.35 : 1));
       a.ring.rotation.z += dt * 0.4;
       var ls = isActive ? 1.12 : 1;
@@ -1155,7 +1156,7 @@
     COLOR_KEYS.forEach(function (k) { cur[k].lerp(tgt[k], lk); });
     NUM_KEYS.forEach(function (k) { cur[k] += (tgt[k] - cur[k]) * lk; });
     gridMat.opacity = cur.gridOp * (0.85 + 0.15 * Math.sin(t * 1.3));
-    equatorMat.opacity = cur.gridOp * 1.6;
+    equatorMat.opacity = cur.gridOp * 1.1;
     starsMat.opacity = cur.starsOp;
     haloMat.opacity = cur.haloOp;
     pillarMat.opacity = cur.pillarOp;
