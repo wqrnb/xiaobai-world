@@ -6,8 +6,8 @@
   <meta name="theme-color" content="#ff7bac">
   <link rel="icon" type="image/png" href="favicon.png">
   <link rel="shortcut icon" type="image/png" href="favicon.ico">
-  <meta name="description" content="小白大世界 — 小白超白的的个人作品集：先认识小白，再看娃娃开箱、好物测评、GBC 和 chiikawa。">
-  <title>小白大世界 · Xiaobai's World</title>
+  <meta name="description" content="小白超白的空间 — 小白超白的的个人作品集：先认识小白，再看娃娃开箱、好物测评、GBC 和 chiikawa。">
+  <title>小白超白的空间 · Xiaobai's Space</title>
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
@@ -31,8 +31,8 @@
     <a class="brand" href="#about">
       <span class="brand-badge"><svg class="icon" aria-hidden="true"><use href="#i-heart"></use></svg></span>
       <span class="brand-text">
-        <b>小白大世界</b>
-        <i>XIAOBAI'S WORLD</i>
+        <b>小白超白的空间</b>
+        <i>XIAOBAI'S SPACE</i>
       </span>
     </a>
 
@@ -48,6 +48,7 @@
       <button class="icon-btn" id="search-btn" title="搜索作品" aria-label="搜索作品"><svg class="icon" aria-hidden="true"><use href="#i-search"></use></svg></button>
       <button class="icon-btn" id="theme-btn" title="切换日夜氛围" aria-label="切换日夜氛围"><svg class="icon" aria-hidden="true"><use href="#i-moon"></use></svg></button>
       <button class="icon-btn" id="music-btn" title="播放背景音乐（默认关闭）" aria-label="播放背景音乐"><svg class="icon" aria-hidden="true"><use href="#i-music"></use></svg></button>
+      <button class="icon-btn pulse-btn" id="pulse-btn" title="脉冲跃迁（快捷键 B）" aria-label="脉冲跃迁"><svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg></button>
     </div>
   </header>
 
@@ -58,7 +59,7 @@
         <div class="hero-copy">
           <p class="eyebrow reveal"><svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg> 你好呀，这里是</p>
           <h1 class="hero-name reveal" style="--d:.06s">小白超白的</h1>
-          <p class="hero-sub reveal" style="--d:.12s">XIAOBAI'S WORLD · 小白大世界</p>
+          <p class="hero-sub reveal" style="--d:.12s">XIAOBAI'S SPACE · 小白超白的空间</p>
           <p class="hero-bio reveal" style="--d:.18s">
             小白的二次元日常～ 喜欢粉色的小可爱们！！！
           </p>
@@ -69,6 +70,11 @@
             <a class="btn btn-primary" id="hero-bili" href="#" target="_blank" rel="noopener noreferrer"><svg class="icon" aria-hidden="true"><use href="#i-tv"></use></svg> 去B站看小白</a>
             <a class="btn btn-ghost" id="hero-xhs" href="#" target="_blank" rel="noopener noreferrer"><svg class="icon" aria-hidden="true"><use href="#i-book-heart"></use></svg> 小红书主页</a>
           </div>
+            <div class="hero-hints reveal" style="--d:.34s">
+              <span><kbd>B</kbd> 脉冲跃迁</span>
+              <span><kbd>/</kbd> 搜索作品</span>
+              <span><svg class="icon" aria-hidden="true"><use href="#i-mouse-pointer-2"></use></svg> 移动鼠标看视差</span>
+            </div>
           <p class="hero-sign reveal" style="--d:.36s" id="hero-sign">加油加油～</p>
         </div>
 
@@ -136,7 +142,7 @@
       </div>
       <div class="follow-cards" id="follow-cards"></div>
       <footer class="footer">
-        <p><svg class="icon" aria-hidden="true"><use href="#i-heart"></use></svg> 小白大世界 · 加油加油～</p>
+        <p><svg class="icon" aria-hidden="true"><use href="#i-heart"></use></svg> 小白超白的空间 · 加油加油～</p>
         <p>所有作品数据与封面来自小白超白的公开主页，仅作个人作品集展示。</p>
       </footer>
     </section>
@@ -182,6 +188,7 @@
     </article>
   </div>
 
+  <canvas class="fx-canvas" id="fx-canvas" aria-hidden="true"></canvas>
   <button class="back-top" id="back-top" aria-label="回到顶部"><svg class="icon" aria-hidden="true"><use href="#i-arrow-up"></use></svg></button>
 
   <script src="assets/js/data.js"></script>

@@ -1,4 +1,4 @@
-# 小白大世界 · Xiaobai's World
+# 小白超白的空间 · Xiaobai's Space
 
 **小白超白的** 的个人作品集官网。
 
@@ -18,7 +18,7 @@ https://wqrnb.github.io/xiaobai-world/
 4. **B站视频墙**：42 支真实视频，播放 / 弹幕 / 日期
 5. **关注小白**：B站 / 小红书关注卡片
 
-支持搜索、日夜粉白主题切换、内置原创八音盒（默认关闭）。3D 背景为纯程序化生成（能量核心、粒子爆发、冲击波、星云、bloom），不加载任何纹理图片。滚动到不同章节时会触发相机跃迁、闪光和星云配色渐变，鼠标移动会产生视差。界面图标使用本地打包的 Lucide 线性 SVG 图标，不使用 emoji。
+支持搜索、日夜粉白主题切换、内置原创八音盒（默认关闭）。3D 背景为纯程序化生成（能量核心、粒子爆发、冲击波、星云、bloom），不加载任何纹理图片。滚动到不同章节时会触发相机跃迁、闪光和星云配色渐变；鼠标移动有 3D 视差与光点拖尾，点击会溅出星尘，作品卡片支持 3D 倾斜和反光。按 B 可随时触发脉冲跃迁，按 / 可快速搜索。界面图标使用本地打包的 Lucide 线性 SVG 图标，不使用 emoji。
 
 ## 本地运行
 
@@ -77,7 +77,7 @@ powershell -ExecutionPolicy Bypass -File tools/deploy.ps1
 cd site
 git init -b main
 git add -A
-git commit -m "deploy: 小白大世界"
+git commit -m "deploy: 小白超白的空间"
 gh repo create <用户名>/xiaobai-world --public --source . --remote origin --push
 gh api repos/<用户名>/xiaobai-world/pages -f "source[branch]=main" -f "source[path]=/" -X POST
 ```

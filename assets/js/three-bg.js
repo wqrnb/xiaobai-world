@@ -1,4 +1,4 @@
-/* 小白大世界 v3 · 3D 大爆炸星云背景
+/* 小白超白的空间 v3 · 3D 大爆炸星云背景
  * 纯程序化 WebGL：粉白星云、能量核心、粒子爆发、冲击波、bloom。
  * 不加载任何图片纹理，因此 file:// 双击也可正常运行。
  * 暴露 window.XBW_BG = { start, setTheme, supported }
@@ -658,6 +658,11 @@
   };
 
   api.setTheme = setTheme;
+  api.pulse = function () {
+    if (!api.supported || introPhase !== 'ambient') return;
+    startWarp();
+    resetBurst();
+  };
 
   buildScene();
   initSectionColors();

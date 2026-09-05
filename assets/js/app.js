@@ -1,4 +1,4 @@
-/* 小白大世界 v2 · 2.5D 单页滚动版
+/* 小白超白的空间 v2 · 2.5D 单页滚动版
  * 顺序：先认识小白 → 精选 → 小红书岛 → B站视频墙 → 关注
  * 纯静态，数据内嵌在 data.js，双击 file:// 可用。
  */
@@ -144,6 +144,19 @@
         e.preventDefault();
         card.click();
       }
+    });
+    card.addEventListener('pointermove', function (e) {
+      var rect = card.getBoundingClientRect();
+      var px = (e.clientX - rect.left) / rect.width;
+      var py = (e.clientY - rect.top) / rect.height;
+      card.style.setProperty('--ry', ((px - 0.5) * 12).toFixed(2) + 'deg');
+      card.style.setProperty('--rx', ((0.5 - py) * 10).toFixed(2) + 'deg');
+      card.style.setProperty('--gx', (px * 100).toFixed(1) + '%');
+      card.style.setProperty('--gy', (py * 100).toFixed(1) + '%');
+    });
+    card.addEventListener('pointerleave', function () {
+      card.style.setProperty('--rx', '0deg');
+      card.style.setProperty('--ry', '0deg');
     });
   }
 
@@ -484,6 +497,93 @@
     }
   }
 
+  /* ============================================================
+   * 11.5 额外交互：光点拖尾 / 点击星尘 / 3D 卡片倾斜
+   * ============================================================ */
+  var fxCanvas = null;
+  var fxCtx = null;
+  var fxParticles = [];
+  var fxRunning = false;
+
+  function setupFxCanvas() {
+    fxCanvas = $('#fx-canvas');
+    if (!fxCanvas) return;
+    fxCtx = fxCanvas.getContext('2d');
+    function resize() {
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      fxCanvas.width = Math.floor(window.innerWidth * dpr);
+      fxCanvas.height = Math.floor(window.innerHeight * dpr);
+      fxCanvas.style.width = window.innerWidth + 'px';
+      fxCanvas.style.height = window.innerHeight + 'px';
+      fxCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    function spawn(x, y, count, burst) {
+      for (var i = 0; i < count; i++) {
+        var angle = Math.random() * Math.PI * 2;
+        var speed = burst ? 1.2 + Math.random() * 3.6 : 0.25 + Math.random() * 0.8;
+        fxParticles.push({
+          x: x,
+          y: y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          life: 1,
+          decay: burst ? 0.016 + Math.random() * 0.02 : 0.03 + Math.random() * 0.025,
+          size: burst ? 1.5 + Math.random() * 3 : 0.8 + Math.random() * 1.8,
+          hue: burst ? (320 + Math.random() * 40) : (330 + Math.random() * 25)
+        });
+      }
+      if (fxParticles.length > 180) fxParticles.splice(0, fxParticles.length - 180);
+    }
+
+    window.addEventListener('pointermove', function (e) {
+      if (Math.random() > 0.45) spawn(e.clientX, e.clientY, 1, false);
+    }, { passive: true });
+
+    window.addEventListener('pointerdown', function (e) {
+      spawn(e.clientX, e.clientY, 14, true);
+    }, { passive: true });
+
+    function drawFx() {
+      fxRunning = true;
+      if (!fxCtx) return;
+      fxCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+      fxParticles.forEach(function (p) {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vx *= 0.975;
+        p.vy *= 0.975;
+        p.life -= p.decay;
+        if (p.life <= 0) return;
+        fxCtx.beginPath();
+        fxCtx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+        fxCtx.fillStyle = 'hsla(' + p.hue + ', 95%, 80%, ' + (p.life * 0.7).toFixed(3) + ')';
+        fxCtx.shadowColor = 'rgba(255,255,255,0.75)';
+        fxCtx.shadowBlur = 8;
+        fxCtx.fill();
+      });
+      fxParticles = fxParticles.filter(function (p) { return p.life > 0; });
+      requestAnimationFrame(drawFx);
+    }
+    drawFx();
+  }
+
+  function setupHeroTilt() {
+    var stage = $('.hero-stage');
+    if (!stage || window.matchMedia('(pointer: coarse)').matches) return;
+    stage.addEventListener('pointermove', function (e) {
+      var rect = stage.getBoundingClientRect();
+      var px = (e.clientX - rect.left) / rect.width - 0.5;
+      var py = (e.clientY - rect.top) / rect.height - 0.5;
+      stage.style.transform = 'perspective(900px) rotateY(' + (px * 10).toFixed(2) + 'deg) rotateX(' + (-py * 8).toFixed(2) + 'deg)';
+    });
+    stage.addEventListener('pointerleave', function () {
+      stage.style.transform = 'perspective(900px) rotateY(0deg) rotateX(0deg)';
+    });
+  }
+
   function bindUI() {
     $('#search-btn').addEventListener('click', function () {
       if ($('#search-panel').classList.contains('open')) closeSearch(); else openSearch();
@@ -500,6 +600,9 @@
     });
     $('#theme-btn').addEventListener('click', toggleTheme);
     $('#music-btn').addEventListener('click', toggleMusic);
+      $('#pulse-btn').addEventListener('click', function () {
+        if (window.XBW_BG && window.XBW_BG.pulse) window.XBW_BG.pulse();
+      });
     $$('[data-close-detail]').forEach(function (el) { el.addEventListener('click', closeDetail); });
     $('#detail-link').addEventListener('click', function (e) {
       if (this.classList.contains('disabled')) e.preventDefault();
@@ -515,6 +618,13 @@
         closeSearch();
         closeDetail();
       }
+        if (e.key === '/' || (e.ctrlKey && e.key.toLowerCase() === 'k')) {
+          e.preventDefault();
+          if ($('#search-panel').classList.contains('open')) closeSearch(); else openSearch();
+        }
+        if (e.key.toLowerCase() === 'b' && !/input|textarea/i.test(document.activeElement.tagName)) {
+          if (window.XBW_BG && window.XBW_BG.pulse) window.XBW_BG.pulse();
+        }
     });
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll);
@@ -539,6 +649,8 @@
     buildBili();
     buildFollow();
     bindUI();
+      setupFxCanvas();
+      setupHeroTilt();
 
     var bg = window.XBW_BG;
     if (bg && bg.supported) {
